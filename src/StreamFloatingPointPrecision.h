@@ -7,13 +7,13 @@
 namespace VideoCapture {
 
 class StreamFloatingPointPrecision : private boost::noncopyable {
-public:
+ public:
   static const std::streamsize s_kPrecision = 2;
-  explicit StreamFloatingPointPrecision(
+  StreamFloatingPointPrecision(
       std::ostream& outputStream,
       const std::streamsize& precision);
   ~StreamFloatingPointPrecision();
-private:
+ private:
   std::ostream& m_outputStream;
   std::ios_base::fmtflags m_originalFormatFlags;
   std::streamsize m_originalPrecision;

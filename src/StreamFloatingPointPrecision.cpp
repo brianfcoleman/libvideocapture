@@ -5,7 +5,8 @@ namespace VideoCapture {
 StreamFloatingPointPrecision::StreamFloatingPointPrecision(
     std::ostream& outputStream,
     const std::streamsize& precision)
-    : m_outputStream(outputStream)  {
+    : boost::noncopyable(),
+      m_outputStream(outputStream)  {
   m_originalFormatFlags = m_outputStream.setf(
       std::ios::fixed,
       std::ios::floatfield);
