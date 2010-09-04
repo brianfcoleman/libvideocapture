@@ -1,11 +1,11 @@
-#include "ComUtilities.h"
+#include "ComUtilities.hpp"
 
 #include "boost/scoped_array.hpp"
 
 namespace VideoCapture {
 
-static const std::string kEmptyString("");  
-  
+static const std::string kEmptyString("");
+
 boost::shared_ptr<void> comInitializerSharedPtr() {
   CoInitialize(static_cast<LPVOID>(0));
   boost::shared_ptr<void> comInitializerSharedPtr(static_cast<void*>(0),
@@ -66,5 +66,5 @@ const std::string utf8StringFromBasicString(const BSTR basicString) {
   const std::string utf8String(charArrayUTF8String.get());
   return utf8String;
 }
-  
+
 }

@@ -3,25 +3,12 @@
 
 #include <iostream>
 #include "boost/utility.hpp"
-#include "boost/cstdint.hpp"
 #include "boost/shared_ptr.hpp"
-#include "IntegerSize.h"
-#include "StreamFloatingPointPrecision.h"
-#include "DirectShow.h"
+#include "DirectShow.hpp"
+#include "IntegerSize.hpp"
+#include "VideoFormatTypes.hpp"
 
 namespace VideoCapture {
-
-typedef enum RGBFormat {
-  RGB24 = 0,
-  RGB32 = 1,
-  RGBNone = 2
-} RGBFormat;
-
-typedef enum Orientation {
-  OrientationNonInverted = 0,
-  OrientationInverted = 1
-}
-Orientation;
 
 class VideoFormatImpl : private boost::noncopyable {
  public:
@@ -34,9 +21,11 @@ class VideoFormatImpl : private boost::noncopyable {
   double framesPerSecond() const;
   IntegerSize sizePixels() const;
   Orientation orientation() const;
-  boost::int32_t bitsPerPixel() const;
+  std::size_t bitsPerPixel() const;
+  std::size_t sizeBytes() const;
+  std::size_t sizeRowBytes() const;
   RGBFormat rgbFormat() const;
-  bool VideoFormatImpl::setVideoFormatOfStream(
+  bool VideoFormatImpl::setMediaTypeOfStream(
       const boost::shared_ptr<IAMStreamConfig>& streamConfig);
   operator bool() const {
       return isInitialized();

@@ -1,7 +1,7 @@
 #ifndef QEDIT_TYPE_LIBRARY_IMPL
 #define QEDIT_TYPE_LIBRARY_IMPL
 
-#include "TypeLibrary.h"
+#include "TypeLibrary.hpp"
 
 namespace VideoCapture {
 

@@ -5,8 +5,8 @@
 #include "boost/cstdint.hpp"
 #include "boost/shared_ptr.hpp"
 #include "dshow.h"
-#include "COMUtilities.h"
-#include "QeditTypeLibrary.h"
+#include "COMUtilities.hpp"
+#include "QeditTypeLibrary.hpp"
 
 namespace VideoCapture {
 

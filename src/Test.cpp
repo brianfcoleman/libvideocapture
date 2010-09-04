@@ -1,4 +1,4 @@
-#include "DirectShow.h"
+#include "DirectShow.hpp"
 
 int main() {
   using namespace VideoCapture;

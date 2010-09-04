@@ -1,7 +1,7 @@
-#include "DirectShow.h"
+#include "DirectShow.hpp"
 
 #include <iostream>
-#include "TypeLibrary.h"
+#include "TypeLibrary.hpp"
 
 namespace VideoCapture {
 
@@ -11,7 +11,7 @@ static void FreeMediaType(AM_MEDIA_TYPE& mediaType);
 
 boost::shared_ptr<AM_MEDIA_TYPE>
 mediaTypeSharedPtr(AM_MEDIA_TYPE* pMediaType) {
-  boost::shared_ptr<AM_MEDIA_TYPE> mediaTypeSharedPtr(pMediaType, 
+  boost::shared_ptr<AM_MEDIA_TYPE> mediaTypeSharedPtr(pMediaType,
                                                       DeleteMediaType);
   return mediaTypeSharedPtr;
 }

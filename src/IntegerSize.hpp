@@ -2,7 +2,6 @@
 #define VIDEOCAPTURE_INTEGER_SIZE_H
 
 #include "boost/cstdint.hpp"
-#include "StreamFloatingPointPrecision.h"
 
 namespace VideoCapture {
 

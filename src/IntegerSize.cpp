@@ -1,4 +1,5 @@
-#include "IntegerSize.h"
+#include "IntegerSize.hpp"
+#include "StreamFloatingPointPrecision.hpp"
 
 namespace VideoCapture {
 

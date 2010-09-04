@@ -1,5 +1,5 @@
-#ifndef TYPE_LIBRARY_H
-#define TYPE_LIBRARY_H
+#ifndef VIDEO_CAPTURE_TYPE_LIBRARY_H
+#define VIDEO_CAPTURE_TYPE_LIBRARY_H
 
 #include <vector>
 #include <map>
@@ -30,6 +30,6 @@ private:
             const std::vector<const std::wstring>& classIdentifierNames);
 };
 
-}
+} // VideoCapture
 
-#endif // TYPE_LIBRARY_H
+#endif // VIDEO_CAPTURE_TYPE_LIBRARY_H

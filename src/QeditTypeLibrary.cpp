@@ -1,5 +1,5 @@
-#include "QeditTypeLibrary.h"
-#include "QeditTypeLibraryImpl.h"
+#include "QeditTypeLibrary.hpp"
+#include "QeditTypeLibraryImpl.hpp"
 
 namespace VideoCapture {
 

@@ -1,5 +1,5 @@
-#ifndef QEDIT_TYPE_LIBRARY
-#define QEDIT_TYPE_LIBRARY
+#ifndef VIDEO_CAPTURE_QEDIT_TYPE_LIBRARY
+#define VIDEO_CAPTURE_QEDIT_TYPE_LIBRARY
 
 #include "boost/shared_ptr.hpp"
 #include "oaidl.h"
@@ -22,6 +22,6 @@ private:
   boost::shared_ptr<QeditTypeLibraryImpl> m_pImpl;
 };
   
-}
+} // VideoCapture
 
-#endif // QEDIT_TYPE_LIBRARY
+#endif // VIDEO_CAPTURE_QEDIT_TYPE_LIBRARY

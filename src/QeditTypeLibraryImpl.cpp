@@ -1,4 +1,4 @@
-#include "QeditTypeLibraryImpl.h"
+#include "QeditTypeLibraryImpl.hpp"
 
 namespace VideoCapture {
 
@@ -6,7 +6,7 @@ static const std::wstring kTypeLibraryName(L"qedit.dll");
 
 static const std::wstring kIID_ISampleGrabberName(L"ISampleGrabber");
 
-static const std::wstring 
+static const std::wstring
 kIID_ISampleGrabberCBName(L"ISampleGrabberCB");
 
 static const std::wstring kCLSID_SampleGrabberName(L"SampleGrabber");

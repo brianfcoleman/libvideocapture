@@ -1,12 +1,17 @@
-#include "VideoFormat.h"
+#include "VideoFormatImpl.hpp"
+#include "StreamFloatingPointPrecision.hpp"
 
 namespace VideoCapture {
+
+static const std::size_t kBitsPerByte = 8;
+
+static std::size_t convertBitsToBytes(std::size_t countBits);
 
 VideoFormatImpl::VideoFormatImpl()
     : boost::noncopyable(),
       m_isInitialized(false),
       m_framesPerSecond(0),
-      m_orientation(OrientationNonInverted),
+      m_orientation(OrientationNone),
       m_bitsPerPixel(0),
       m_uncompressedRGB(false),
       m_RGBFormat(RGBNone) {
@@ -19,7 +24,7 @@ VideoFormatImpl::VideoFormatImpl(
     : boost::noncopyable(),
       m_isInitialized(false),
       m_framesPerSecond(0),
-      m_orientation(OrientationNonInverted),
+      m_orientation(OrientationNone),
       m_bitsPerPixel(0),
       m_uncompressedRGB(false),
       m_RGBFormat(RGBNone) {
@@ -62,7 +67,7 @@ bool VideoFormatImpl::isRGBFormat() const {
   if (!isVideoFormat()) {
     return false;
   }
-  
+
   if (!m_uncompressedRGB) {
     return false;
   }
@@ -70,7 +75,7 @@ bool VideoFormatImpl::isRGBFormat() const {
   if (m_RGBFormat == RGBNone) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -83,7 +88,7 @@ bool VideoFormatImpl::initialize(
       index,
       &pMediaType,
       reinterpret_cast<boost::uint8_t*>(&m_streamCapabilities));
-  
+
   if (FAILED(result)) {
     return false;
   }
@@ -104,7 +109,7 @@ bool VideoFormatImpl::extractData() {
   if (!isVideoFormat()) {
     return false;
   }
-  
+
   VIDEOINFOHEADER& videoHeader(
       *(reinterpret_cast<VIDEOINFOHEADER*>(m_mediaType->pbFormat)));
   BITMAPINFOHEADER& bmiHeader(videoHeader.bmiHeader);
@@ -132,11 +137,11 @@ bool VideoFormatImpl::extractData() {
   }
 
   if (m_mediaType->subtype == MEDIASUBTYPE_RGB24) {
-    m_RGBFormat = RGB24;
+    m_RGBFormat = RGB888;
   }
 
   if (m_mediaType->subtype == MEDIASUBTYPE_RGB32) {
-    m_RGBFormat = RGB32;
+    m_RGBFormat = RGBA8888;
   }
 
   return true;
@@ -154,15 +159,61 @@ Orientation VideoFormatImpl::orientation() const {
   return m_orientation;
 }
 
-boost::int32_t VideoFormatImpl::bitsPerPixel() const {
+std::size_t VideoFormatImpl::bitsPerPixel() const {
   return m_bitsPerPixel;
+}
+
+std::size_t VideoFormatImpl::sizeBytes() const {
+  if (!isInitialized()) {
+    return 0;
+  }
+
+  if (m_sizePixels.width() <= 0) {
+    return 0;
+  }
+
+  if (m_sizePixels.height() <= 0) {
+    return 0;
+  }
+
+  if (m_bitsPerPixel == 0) {
+    return 0;
+  }
+
+  std::size_t countPixels = m_sizePixels.width() * m_sizePixels.height();
+  std::size_t sizeBits = m_bitsPerPixel * countPixels;
+
+  std::size_t sizeBytes = convertBitsToBytes(sizeBits);
+  return sizeBytes;
+}
+
+std::size_t VideoFormatImpl::sizeRowBytes() const {
+  if (!isInitialized()) {
+    return false;
+  }
+
+  if (m_sizePixels.width() <= 0) {
+    return 0;
+  }
+
+  if (m_sizePixels.height() <= 0) {
+    return 0;
+  }
+
+  if (m_bitsPerPixel == 0) {
+    return 0;
+  }
+
+  std::size_t sizeRowBits = m_bitsPerPixel * m_sizePixels.width();
+  std::size_t sizeRowBytes = convertBitsToBytes(sizeRowBits);
+  return sizeRowBytes;
 }
 
 RGBFormat VideoFormatImpl::rgbFormat() const {
   return m_RGBFormat;
 }
 
-bool VideoFormatImpl::setVideoFormatOfStream(
+bool VideoFormatImpl::setMediaTypeOfStream(
     const boost::shared_ptr<IAMStreamConfig>& streamConfig) {
   if (!isInitialized()) {
     return false;
@@ -203,16 +254,25 @@ std::ostream& operator<<(
   }
   outputStream << "bitsPerPixel: " << videoFormat.bitsPerPixel() << std::endl;
   switch (videoFormat.rgbFormat()) {
-    case RGB24:
-      outputStream << "RGBFormat: RGB24" << std::endl;
+    case RGB888:
+      outputStream << "RGBFormat: RGB888" << std::endl;
       break;
-    case RGB32:
-      outputStream << "RGBFormat: RGB32" << std::endl;
+    case RGBA8888:
+      outputStream << "RGBFormat: RGBA8888" << std::endl;
       break;
     default:
       break;
   }
   return outputStream;
+}
+
+static std::size_t convertBitsToBytes(std::size_t countBits) {
+  if ((countBits % kBitsPerByte) != 0) {
+    return 0;
+  }
+
+  std::size_t countBytes = countBits / kBitsPerByte;
+  return countBytes;
 }
 
 } // VideoCapture

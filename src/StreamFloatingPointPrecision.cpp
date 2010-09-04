@@ -1,4 +1,4 @@
-#include "StreamFloatingPointPrecision.h"
+#include "StreamFloatingPointPrecision.hpp"
 
 namespace VideoCapture {
 
