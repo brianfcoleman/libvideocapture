@@ -11,9 +11,10 @@ class QeditTypeLibraryImpl;
 class QeditTypeLibrary {
 public:
   QeditTypeLibrary();
-  IID IID_ISampleGrabber() const;
-  IID IID_ISampleGrabberCB() const;
-  CLSID CLSID_SampleGrabber() const;
+  const IID IID_ISampleGrabber() const;
+  const IID IID_ISampleGrabberCB() const;
+  const CLSID CLSID_SampleGrabber() const;
+  const CLSID CLSID_NullRenderer() const;
   operator bool() const {
     return isInitialized();
   }
@@ -21,7 +22,7 @@ private:
   bool isInitialized() const;
   boost::shared_ptr<QeditTypeLibraryImpl> m_pImpl;
 };
-  
+
 } // VideoCapture
 
 #endif // VIDEO_CAPTURE_QEDIT_TYPE_LIBRARY

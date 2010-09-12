@@ -2,6 +2,9 @@
 #define VIDEO_CAPTURE_RGB_VIDEO_FORMAT_H
 
 #include "boost/shared_ptr.hpp"
+#include "boost/weak_ptr.hpp"
+#include "boost/uuid/uuid.hpp"
+#include "boost/uuid/uuid_generators.hpp"
 #include "IntegerSize.hpp"
 #include "VideoFormatTypes.hpp"
 
@@ -11,10 +14,15 @@ class VideoFormatImpl;
 
 class RGBVideoFormat {
  public:
+  typedef boost::weak_ptr<VideoFormatImpl> ImplWeakPtr;
   typedef boost::shared_ptr<VideoFormatImpl> ImplPtr;
+  typedef boost::uuids::uuid Uuid;
+  typedef boost::uuids::nil_generator NilUuidGenerator;
   RGBVideoFormat();
   explicit RGBVideoFormat(const ImplPtr& pImpl);
+  virtual ~RGBVideoFormat();
   bool isInitialized() const;
+  const Uuid uuid() const;
   double framesPerSecond() const;
   IntegerSize sizePixels() const;
   Orientation orientation() const;
@@ -26,7 +34,8 @@ class RGBVideoFormat {
     return isInitialized();
   }
  private:
-  ImplPtr m_pImpl;
+  ImplPtr lockImplPtr() const;
+  ImplWeakPtr m_pImpl;
 };
 
 } // VideoCapture

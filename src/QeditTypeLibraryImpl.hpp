@@ -9,11 +9,12 @@ class QeditTypeLibraryImpl :
   public TypeLibrary {
 public:
   QeditTypeLibraryImpl();
-  IID IID_ISampleGrabber() const;
-  IID IID_ISampleGrabberCB() const;
-  CLSID CLSID_SampleGrabber() const;
+  const IID IID_ISampleGrabber() const;
+  const IID IID_ISampleGrabberCB() const;
+  const CLSID CLSID_SampleGrabber() const;
+  const CLSID CLSID_NullRenderer() const;
 };
 
-}
+} // VideoCapture
 
 #endif // QEDIT_TYPE_LIBRARY_IMPL

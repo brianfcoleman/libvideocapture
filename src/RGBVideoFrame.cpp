@@ -37,12 +37,12 @@ bool RGBVideoFrame::initialize(const RGBVideoFormat& videoFormat) {
       return createRGBImageAndAssignToDestinationImage<rgb8_image_t>(
           videoFormat,
           m_image);
-    case RGBA8888:
-      return createRGBImageAndAssignToDestinationImage<rgba8_image_t>(
-          videoFormat,
-          m_image);
     case BGR888:
       return createRGBImageAndAssignToDestinationImage<bgr8_image_t>(
+          videoFormat,
+          m_image);
+    case RGBA8888:
+      return createRGBImageAndAssignToDestinationImage<rgba8_image_t>(
           videoFormat,
           m_image);
     case ABGR8888:

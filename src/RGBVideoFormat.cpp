@@ -12,61 +12,101 @@ RGBVideoFormat::RGBVideoFormat(const ImplPtr& pImpl)
 
 }
 
+RGBVideoFormat::~RGBVideoFormat() {
+
+}
+
 bool RGBVideoFormat::isInitialized() const {
-  if (!m_pImpl) {
+  ImplPtr pImpl(m_pImpl.lock());
+  if (!pImpl) {
     return false;
   }
-  return m_pImpl->isInitialized();
+
+  if (!pImpl->isInitialized()) {
+    return false;
+  }
+
+  return true;
+}
+
+RGBVideoFormat::ImplPtr RGBVideoFormat::lockImplPtr() const {
+  ImplPtr pImpl(m_pImpl.lock());
+  if (!pImpl) {
+    return pImpl;
+  }
+
+  if (!pImpl->isInitialized()) {
+    pImpl.reset();
+  }
+
+  return pImpl;
+}
+
+const RGBVideoFormat::Uuid RGBVideoFormat::uuid() const {
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
+    NilUuidGenerator generator;
+    Uuid nilUuid(generator());
+    return nilUuid;
+  }
+  return pImpl->uuid();
 }
 
 double RGBVideoFormat::framesPerSecond() const {
-  if (!isInitialized()) {
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
     return 0;
   }
-  return m_pImpl->framesPerSecond();
+  return pImpl->framesPerSecond();
 }
 
 IntegerSize RGBVideoFormat::sizePixels() const {
-  if (!isInitialized()) {
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
     IntegerSize zeroSize;
     return zeroSize;
   }
-  return m_pImpl->sizePixels();
+  return pImpl->sizePixels();
 }
 
 Orientation RGBVideoFormat::orientation() const {
-  if (!isInitialized()) {
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
     return OrientationNone;
   }
-  return m_pImpl->orientation();
+  return pImpl->orientation();
 }
 
 std::size_t RGBVideoFormat::bitsPerPixel() const {
-  if (!isInitialized()) {
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
     return 0;
   }
-  return m_pImpl->bitsPerPixel();
+  return pImpl->bitsPerPixel();
 }
 
 std::size_t RGBVideoFormat::sizeBytes() const {
-  if (!isInitialized()) {
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
     return 0;
   }
-  return m_pImpl->sizeBytes();
+  return pImpl->sizeBytes();
 }
 
 std::size_t RGBVideoFormat::sizeRowBytes() const {
-  if (!isInitialized()) {
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
     return 0;
   }
-  return m_pImpl->sizeRowBytes();
+  return pImpl->sizeRowBytes();
 }
 
 RGBFormat RGBVideoFormat::rgbFormat() const {
-  if (!isInitialized()) {
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
     return RGBNone;
   }
-  return m_pImpl->rgbFormat();
+  return pImpl->rgbFormat();
 }
 
 } // VideoCapture

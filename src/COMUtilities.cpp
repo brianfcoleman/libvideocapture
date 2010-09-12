@@ -8,8 +8,9 @@ static const std::string kEmptyString("");
 
 boost::shared_ptr<void> comInitializerSharedPtr() {
   CoInitialize(static_cast<LPVOID>(0));
-  boost::shared_ptr<void> comInitializerSharedPtr(static_cast<void*>(0),
-                                                  boost::bind(CoUninitialize));
+  boost::shared_ptr<void> comInitializerSharedPtr(
+      static_cast<void*>(0),
+      boost::bind(CoUninitialize));
   return comInitializerSharedPtr;
 }
 
@@ -18,8 +19,8 @@ boost::shared_ptr<VARIANT> variantSharedPtr(VARIANT* pVariant) {
     boost::shared_ptr<VARIANT> variantSharedPtr;
     return variantSharedPtr;
   }
-  ::VariantInit(pVariant);
-  boost::shared_ptr<VARIANT> variantSharedPtr(pVariant, ::VariantClear);
+  VariantInit(pVariant);
+  boost::shared_ptr<VARIANT> variantSharedPtr(pVariant, VariantClear);
   return variantSharedPtr;
 }
 
@@ -39,14 +40,15 @@ const std::string utf8StringFromBasicString(const BSTR basicString) {
   int countBytesUTF8String = 0;
   LPCSTR pDefaultChar = 0;
   LPBOOL pUsedDefaultChar = 0;
-  countBytesUTF8String = WideCharToMultiByte(codePage,
-                                             flags,
-                                             wideCharString,
-                                             countCharsWideCharString,
-                                             pUTF8String,
-                                             countBytesUTF8String,
-                                             pDefaultChar,
-                                             pUsedDefaultChar);
+  countBytesUTF8String = WideCharToMultiByte(
+      codePage,
+      flags,
+      wideCharString,
+      countCharsWideCharString,
+      pUTF8String,
+      countBytesUTF8String,
+      pDefaultChar,
+      pUsedDefaultChar);
   if (countBytesUTF8String <= 0) {
    return kEmptyString;
   }
@@ -55,16 +57,17 @@ const std::string utf8StringFromBasicString(const BSTR basicString) {
     return kEmptyString;
   }
   pUTF8String = static_cast<LPSTR>(charArrayUTF8String.get());
-  WideCharToMultiByte(codePage,
-                      flags,
-                      wideCharString,
-                      countCharsWideCharString,
-                      pUTF8String,
-                      countBytesUTF8String,
-                      pDefaultChar,
-                      pUsedDefaultChar);
+  WideCharToMultiByte(
+      codePage,
+      flags,
+      wideCharString,
+      countCharsWideCharString,
+      pUTF8String,
+      countBytesUTF8String,
+      pDefaultChar,
+      pUsedDefaultChar);
   const std::string utf8String(charArrayUTF8String.get());
   return utf8String;
 }
 
-}
+} // VideoCapture

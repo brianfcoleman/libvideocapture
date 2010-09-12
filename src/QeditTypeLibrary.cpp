@@ -8,16 +8,20 @@ QeditTypeLibrary::QeditTypeLibrary() :
 
 }
 
-IID QeditTypeLibrary::IID_ISampleGrabber() const {
+const IID QeditTypeLibrary::IID_ISampleGrabber() const {
   return m_pImpl->IID_ISampleGrabber();
 }
 
-IID QeditTypeLibrary::IID_ISampleGrabberCB() const {
+const IID QeditTypeLibrary::IID_ISampleGrabberCB() const {
   return m_pImpl->IID_ISampleGrabberCB();
 }
 
-CLSID QeditTypeLibrary::CLSID_SampleGrabber() const {
+const CLSID QeditTypeLibrary::CLSID_SampleGrabber() const {
   return m_pImpl->CLSID_SampleGrabber();
+}
+
+const CLSID QeditTypeLibrary::CLSID_NullRenderer() const {
+  return m_pImpl->CLSID_NullRenderer();
 }
 
 bool QeditTypeLibrary::isInitialized() const {

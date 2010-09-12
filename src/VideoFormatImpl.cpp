@@ -8,8 +8,8 @@ static const std::size_t kBitsPerByte = 8;
 static std::size_t convertBitsToBytes(std::size_t countBits);
 
 VideoFormatImpl::VideoFormatImpl()
-    : boost::noncopyable(),
-      m_isInitialized(false),
+    : m_isInitialized(false),
+      m_uuid(NilUuidGenerator()()),
       m_framesPerSecond(0),
       m_orientation(OrientationNone),
       m_bitsPerPixel(0),
@@ -19,16 +19,17 @@ VideoFormatImpl::VideoFormatImpl()
 }
 
 VideoFormatImpl::VideoFormatImpl(
-    const boost::shared_ptr<IAMStreamConfig>& streamConfig,
-    const int& index)
-    : boost::noncopyable(),
-      m_isInitialized(false),
+    const boost::shared_ptr<IAMStreamConfig>& pStreamConfig,
+    const int index,
+    const VideoFormatImpl::Uuid& uuid)
+    : m_isInitialized(false),
+      m_uuid(uuid),
       m_framesPerSecond(0),
       m_orientation(OrientationNone),
       m_bitsPerPixel(0),
       m_uncompressedRGB(false),
       m_RGBFormat(RGBNone) {
-  m_isInitialized = initialize(streamConfig, index);
+  m_isInitialized = initialize(pStreamConfig, index);
 }
 
 bool VideoFormatImpl::isInitialized() const {
@@ -36,23 +37,23 @@ bool VideoFormatImpl::isInitialized() const {
 }
 
 bool VideoFormatImpl::isVideoFormat() const {
-  if (!m_mediaType) {
+  if (!m_pMediaType) {
     return false;
   }
 
-  if (m_mediaType->majortype != MEDIATYPE_Video) {
+  if (m_pMediaType->majortype != MEDIATYPE_Video) {
     return false;
   }
 
-  if (m_mediaType->formattype != FORMAT_VideoInfo) {
+  if (m_pMediaType->formattype != FORMAT_VideoInfo) {
     return false;
   }
 
-  if (m_mediaType->cbFormat != sizeof(VIDEOINFOHEADER)) {
+  if (m_pMediaType->cbFormat != sizeof(VIDEOINFOHEADER)) {
     return false;
   }
 
-  if (!m_mediaType->pbFormat) {
+  if (!m_pMediaType->pbFormat) {
     return false;
   }
 
@@ -80,29 +81,31 @@ bool VideoFormatImpl::isRGBFormat() const {
 }
 
 bool VideoFormatImpl::initialize(
-    const boost::shared_ptr<IAMStreamConfig>& streamConfig,
-    const int& index) {
-  AM_MEDIA_TYPE* pMediaType(0);
+    const boost::shared_ptr<IAMStreamConfig>& pStreamConfig,
+    const int index) {
+  if (m_uuid.is_nil()) {
+    return false;
+  }
+
+  AM_MEDIA_TYPE* pMediaType = 0;
   HRESULT result;
-  result = streamConfig->GetStreamCaps(
+  result = pStreamConfig->GetStreamCaps(
       index,
       &pMediaType,
       reinterpret_cast<boost::uint8_t*>(&m_streamCapabilities));
-
   if (FAILED(result)) {
     return false;
   }
-  if (!pMediaType) {
+  m_pMediaType = mediaTypeSharedPtr(pMediaType);
+  if (!m_pMediaType) {
     return false;
   }
 
-  m_mediaType = mediaTypeSharedPtr(pMediaType);
-
-  if (!m_mediaType) {
+  if (!extractData()) {
     return false;
   }
 
-  return extractData();
+  return true;
 }
 
 bool VideoFormatImpl::extractData() {
@@ -111,7 +114,7 @@ bool VideoFormatImpl::extractData() {
   }
 
   VIDEOINFOHEADER& videoHeader(
-      *(reinterpret_cast<VIDEOINFOHEADER*>(m_mediaType->pbFormat)));
+      *(reinterpret_cast<VIDEOINFOHEADER*>(m_pMediaType->pbFormat)));
   BITMAPINFOHEADER& bmiHeader(videoHeader.bmiHeader);
 
   double timePerFrameMs =
@@ -136,15 +139,19 @@ bool VideoFormatImpl::extractData() {
     m_uncompressedRGB = false;
   }
 
-  if (m_mediaType->subtype == MEDIASUBTYPE_RGB24) {
+  if (m_pMediaType->subtype == MEDIASUBTYPE_RGB24) {
     m_RGBFormat = RGB888;
   }
 
-  if (m_mediaType->subtype == MEDIASUBTYPE_RGB32) {
+  if (m_pMediaType->subtype == MEDIASUBTYPE_RGB32) {
     m_RGBFormat = RGBA8888;
   }
 
   return true;
+}
+
+const VideoFormatImpl::Uuid VideoFormatImpl::uuid() const {
+  return m_uuid;
 }
 
 double VideoFormatImpl::framesPerSecond() const {
@@ -214,7 +221,7 @@ RGBFormat VideoFormatImpl::rgbFormat() const {
 }
 
 bool VideoFormatImpl::setMediaTypeOfStream(
-    const boost::shared_ptr<IAMStreamConfig>& streamConfig) {
+    const boost::shared_ptr<IAMStreamConfig>& pStreamConfig) {
   if (!isInitialized()) {
     return false;
   }
@@ -223,12 +230,12 @@ bool VideoFormatImpl::setMediaTypeOfStream(
     return false;
   }
 
-  if (!streamConfig) {
+  if (!pStreamConfig) {
     return false;
   }
 
   HRESULT result;
-  result = streamConfig->SetFormat(m_mediaType.get());
+  result = pStreamConfig->SetFormat(m_pMediaType.get());
   return SUCCEEDED(result);
 }
 
