@@ -1,5 +1,6 @@
 #include "RGBVideoFormat.hpp"
 #include "VideoFormatImpl.hpp"
+#include "PimplUtilities.hpp"
 
 namespace VideoCapture {
 
@@ -7,39 +8,17 @@ RGBVideoFormat::RGBVideoFormat() {
 
 }
 
-RGBVideoFormat::RGBVideoFormat(const ImplPtr& pImpl)
+RGBVideoFormat::RGBVideoFormat(const RGBVideoFormat::ImplPtr& pImpl)
     : m_pImpl(pImpl) {
 
 }
 
-RGBVideoFormat::~RGBVideoFormat() {
-
-}
-
 bool RGBVideoFormat::isInitialized() const {
-  ImplPtr pImpl(m_pImpl.lock());
-  if (!pImpl) {
-    return false;
-  }
-
-  if (!pImpl->isInitialized()) {
-    return false;
-  }
-
-  return true;
+  return VideoCapture::isInitialized(m_pImpl);
 }
 
 RGBVideoFormat::ImplPtr RGBVideoFormat::lockImplPtr() const {
-  ImplPtr pImpl(m_pImpl.lock());
-  if (!pImpl) {
-    return pImpl;
-  }
-
-  if (!pImpl->isInitialized()) {
-    pImpl.reset();
-  }
-
-  return pImpl;
+  return VideoCapture::lockImplPtr(m_pImpl);
 }
 
 const RGBVideoFormat::Uuid RGBVideoFormat::uuid() const {

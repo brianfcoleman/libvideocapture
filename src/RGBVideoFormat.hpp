@@ -14,13 +14,12 @@ class VideoFormatImpl;
 
 class RGBVideoFormat {
  public:
-  typedef boost::weak_ptr<VideoFormatImpl> ImplWeakPtr;
   typedef boost::shared_ptr<VideoFormatImpl> ImplPtr;
+  typedef boost::weak_ptr<VideoFormatImpl> ImplWeakPtr;
   typedef boost::uuids::uuid Uuid;
   typedef boost::uuids::nil_generator NilUuidGenerator;
   RGBVideoFormat();
   explicit RGBVideoFormat(const ImplPtr& pImpl);
-  virtual ~RGBVideoFormat();
   bool isInitialized() const;
   const Uuid uuid() const;
   double framesPerSecond() const;

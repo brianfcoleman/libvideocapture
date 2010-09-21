@@ -54,6 +54,10 @@ template <class T> class bounded_buffer : private boost::noncopyable {
     return item;
   }
 
+  bool isInitialized() const {
+    return true;
+  }
+
  private:
    bool is_not_empty() const {
      return m_unread > 0;

@@ -16,8 +16,7 @@
 
 namespace VideoCapture {
 
-class VideoCaptureDeviceImpl : private boost::noncopyable
-{
+class VideoCaptureDeviceImpl : private boost::noncopyable {
  public:
   typedef boost::shared_ptr<IMoniker> IMonikerSharedPtr;
   typedef boost::shared_ptr<IBindCtx> IBindCtxSharedPtr;
@@ -36,7 +35,6 @@ class VideoCaptureDeviceImpl : private boost::noncopyable
   typedef boost::shared_ptr<IAMStreamConfig> IAMStreamConfigSharedPtr;
   typedef boost::shared_ptr<IAMVideoControl> IAMVideoControlSharedPtr;
   typedef boost::shared_ptr<IPin> IPinSharedPtr;
-  typedef boost::shared_ptr<IAMDroppedFrames> IAMDroppedFramesSharedPtr;
   typedef boost::shared_ptr<VideoFormatImpl> VideoFormatSharedPtr;
   typedef boost::uuids::uuid Uuid;
   typedef boost::uuids::random_generator UuidGenerator;
@@ -57,12 +55,11 @@ class VideoCaptureDeviceImpl : private boost::noncopyable
   bool startCapturing(
       const SampleProducerCallbackList& sampleProducerCallbackList);
   bool stopCapturing();
-  double frameRate() const;
-  RGBVideoFormatList videoFormatList() const;
+  double countFramesCapturedPerSecond() const;
+  const RGBVideoFormatList videoFormatList() const;
   const RGBVideoFormat currentVideoFormat() const;
   bool setCurrentVideoFormat(const RGBVideoFormat& videoFormat);
-  operator bool() const
-  {
+  operator bool() const {
     return isInitialized();
   }
  private:
@@ -71,6 +68,7 @@ class VideoCaptureDeviceImpl : private boost::noncopyable
   static const std::wstring s_kNameCaptureFilter;
   static const std::wstring s_kNameSampleGrabberFilter;
   static const std::wstring s_kNameNullRendererFilter;
+  static const std::string s_kEmptyString;
   static const double s_kOneSecondNs;
   bool initialize(UuidGenerator& uuidGenerator);
   bool initName();
@@ -83,7 +81,6 @@ class VideoCaptureDeviceImpl : private boost::noncopyable
   bool initMediaControl();
   bool initVideoControl();
   bool initCapturePin();
-  bool initDroppedFrames();
   bool initStreamConfig();
   bool initVideoFormatMap(UuidGenerator& uuidGenerator);
   RGBVideoFormat rgbVideoFormatFromPair(
@@ -105,7 +102,6 @@ class VideoCaptureDeviceImpl : private boost::noncopyable
   IAMStreamConfigSharedPtr m_pStreamConfig;
   IAMVideoControlSharedPtr m_pVideoControl;
   IPinSharedPtr m_pCapturePin;
-  IAMDroppedFramesSharedPtr m_pDroppedFrames;
   Uuid m_currentVideoFormatUuid;
   VideoFormatMap m_videoFormatsByUuid;
 };

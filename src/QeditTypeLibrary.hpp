@@ -18,8 +18,8 @@ public:
   operator bool() const {
     return isInitialized();
   }
-private:
   bool isInitialized() const;
+private:
   boost::shared_ptr<QeditTypeLibraryImpl> m_pImpl;
 };
 

@@ -7,7 +7,7 @@ namespace VideoCapture {
 static const std::string kEmptyString("");
 
 boost::shared_ptr<void> comInitializerSharedPtr() {
-  CoInitialize(static_cast<LPVOID>(0));
+  CoInitialize(static_cast<void*>(0));
   boost::shared_ptr<void> comInitializerSharedPtr(
       static_cast<void*>(0),
       boost::bind(CoUninitialize));

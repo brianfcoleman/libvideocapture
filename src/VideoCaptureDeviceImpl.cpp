@@ -12,6 +12,7 @@ const std::wstring VideoCaptureDeviceImpl::s_kNameSampleGrabberFilter(
     L"Sample Grabber Filter");
 const std::wstring VideoCaptureDeviceImpl::s_kNameNullRendererFilter(
     L"Null Renderer Filter");
+const std::string VideoCaptureDeviceImpl::s_kEmptyString("");
 const double VideoCaptureDeviceImpl::s_kOneSecondNs = 1.0e9;
 
 VideoCaptureDeviceImpl::VideoCaptureDeviceImpl(
@@ -19,7 +20,7 @@ VideoCaptureDeviceImpl::VideoCaptureDeviceImpl(
     const VideoCaptureDeviceImpl::IMonikerSharedPtr& pMoniker,
     VideoCaptureDeviceImpl::UuidGenerator& uuidGenerator)
     : m_isInitialized(false),
-      m_name(""),
+      m_name(s_kEmptyString),
       m_IID_ISampleGrabber(qeditTypeLibrary.IID_ISampleGrabber()),
       m_IID_ISampleGrabberCB(
           qeditTypeLibrary.IID_ISampleGrabberCB()),
@@ -137,8 +138,6 @@ bool VideoCaptureDeviceImpl::initCaptureGraph() {
   }
 
   initVideoControl();
-
-  initDroppedFrames();
 
   return true;
 }
@@ -343,36 +342,6 @@ bool VideoCaptureDeviceImpl::initCapturePin()
   return true;
 }
 
-bool VideoCaptureDeviceImpl::initDroppedFrames()
-{
-  if (!m_pCaptureGraphBuilder) {
-    return false;
-  }
-
-  if (!m_pCaptureFilter) {
-    return false;
-  }
-
-  IAMDroppedFrames* pDroppedFrames = 0;
-  HRESULT result = m_pCaptureGraphBuilder->FindInterface(
-      &PIN_CATEGORY_CAPTURE,
-      0,
-      m_pCaptureFilter.get(),
-      IID_IAMDroppedFrames,
-      reinterpret_cast<void**>(&pDroppedFrames));
-  if (FAILED(result)) {
-    return false;
-  }
-  IAMDroppedFramesSharedPtr droppedFramesPtr(
-      comInterfaceSharedPtr(pDroppedFrames));
-  m_pDroppedFrames = droppedFramesPtr;
-  if (!m_pDroppedFrames) {
-    return false;
-  }
-
-  return true;
-}
-
 bool VideoCaptureDeviceImpl::initStreamConfig() {
   if (!m_pCaptureGraphBuilder) {
     return false;
@@ -473,7 +442,7 @@ bool VideoCaptureDeviceImpl::stopCapturing() {
   return SUCCEEDED(result);
 }
 
-double VideoCaptureDeviceImpl::frameRate() const {
+double VideoCaptureDeviceImpl::countFramesCapturedPerSecond() const {
   if (!isInitialized()) {
     return 0;
   }
@@ -501,7 +470,7 @@ double VideoCaptureDeviceImpl::frameRate() const {
   return frameRate;
 }
 
-VideoCaptureDeviceImpl::RGBVideoFormatList
+const VideoCaptureDeviceImpl::RGBVideoFormatList
 VideoCaptureDeviceImpl::videoFormatList() const {
   if (!isInitialized()) {
     RGBVideoFormatList emptyList;
