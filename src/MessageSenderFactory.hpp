@@ -29,7 +29,6 @@ template<typename MessageSender> class MessageSenderFactory {
 
   MessageSenderSharedPtr operator()(const MessageQueueType& messageQueue) {
     MessageSenderSharedPtr pMessageSender(new MessageSender(messageQueue));
-    std::cout << "Created message sender" << std::endl;
     m_pListener->set_value(pMessageSender);
     return pMessageSender;
   }

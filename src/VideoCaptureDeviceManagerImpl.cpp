@@ -82,9 +82,6 @@ bool VideoCaptureDeviceManagerImpl::initVideoCaptureDeviceImplList() {
     return false;
   }
 
-  std::cout << "Created " << countVideoCaptureDevices;
-  std::cout << " video capture devices" << std::endl;
-
   return true;
 }
 

@@ -38,7 +38,8 @@ template<typename COMInterface> boost::shared_ptr<
     boost::shared_ptr<COMInterface> comInterfacePtr;
     return comInterfacePtr;
   }
-  boost::shared_ptr<COMInterface> comInterfacePtr(pCOMInterface);
+  boost::shared_ptr<COMInterface> comInterfacePtr(
+      comInterfaceSharedPtr(pCOMInterface));
   return comInterfacePtr;
 }
 

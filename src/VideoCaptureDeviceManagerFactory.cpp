@@ -30,9 +30,7 @@ VideoCaptureDeviceManagerFactory::createVideoCaptureDeviceManager() {
   MessageReceiverSharedPtr pMessageReceiver(
       new MessageReceiverType(s_kMaxSizeMessageQueue, messageSenderFactory));
   try {
-    std::cout << "Waiting for creation of video capture device manager impl" << std::endl;
     callback.wait();
-    std::cout << "Finished for creation of video capture device manager impl" << std::endl;
     if (callback.has_exception()) {
       VideoCaptureDeviceManager videoCaptureDeviceManager;
       return videoCaptureDeviceManager;
@@ -46,7 +44,6 @@ VideoCaptureDeviceManagerFactory::createVideoCaptureDeviceManager() {
       VideoCaptureDeviceManager videoCaptureDeviceManager;
       return videoCaptureDeviceManager;
     }
-    std::cout << "Created video capture device manager impl" << std::endl;
     VideoCaptureDeviceManager videoCaptureDeviceManager(
         pImpl,
         pImpl->messageQueue(),
