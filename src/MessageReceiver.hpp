@@ -13,6 +13,7 @@ template<
   typename MessageSenderFactory> class MessageReceiver : boost::noncopyable {
  public:
   typedef typename MessageSenderFactory::MessageType MessageType;
+  typedef typename MessageSenderFactory::MessageSharedPtr MessageSharedPtr;
   typedef MessageQueue<MessageType> MessageQueueType;
   typedef typename MessageQueueType::QueueImplType QueueImplType;
   typedef typename MessageQueueType::ImplPtr QueueImplPtr;
@@ -46,6 +47,7 @@ template<typename MessageSenderFactory> void receiveMessageLoop(
     typename MessageSenderFactory::QueueImplPtr pMessageQueue,
     MessageSenderFactory& messageSenderFactory) {
   typedef typename MessageSenderFactory::MessageType MessageType;
+  typedef typename MessageSenderFactory::MessageSharedPtr MessageSharedPtr;
   typedef typename MessageSenderFactory::MessageQueueType MessageQueueType;
   typedef typename
       MessageSenderFactory::MessageSenderSharedPtr MessageSenderSharedPtr;
@@ -53,8 +55,11 @@ template<typename MessageSenderFactory> void receiveMessageLoop(
     MessageQueueType messageQueue(pMessageQueue);
     MessageSenderSharedPtr pMessageSender(messageSenderFactory(messageQueue));
     while (!boost::this_thread::interruption_requested()) {
-      MessageType message(pMessageQueue->pop_back());
-      message();
+      MessageSharedPtr pMessage(pMessageQueue->pop_back());
+      if (!pMessage) {
+        continue;
+      }
+      pMessage->operator()();
     }
   } catch (boost::thread_interrupted exception) {
 

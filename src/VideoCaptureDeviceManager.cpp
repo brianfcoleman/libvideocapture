@@ -23,20 +23,23 @@ VideoCaptureDeviceManager::VideoCaptureDeviceManager(
 
 const VideoCaptureDeviceManager::VideoCaptureDeviceList
 VideoCaptureDeviceManager::videoCaptureDeviceList() const {
+  typedef SynchronousMessage<VideoCaptureDeviceList> SynchronousMessageType;
+  typedef SynchronousMessageType::SynchronousMessageSharedPtr
+      SynchronousMessageSharedPtr;
   if (!isInitialized()) {
     VideoCaptureDeviceList emptyList;
     return emptyList;
   }
-  SynchronousMessage<VideoCaptureDeviceList> message(
-      boost::bind<VideoCaptureDeviceList>(
-          &VideoCaptureDeviceManagerImpl::videoCaptureDeviceList,
-          m_pImpl));
+  SynchronousMessageSharedPtr pMessage(
+      new SynchronousMessageType(
+          boost::bind<VideoCaptureDeviceList>(
+              &VideoCaptureDeviceManagerImpl::videoCaptureDeviceList,
+              m_pImpl)));
   VideoCaptureDeviceList returnValueOnFailure;
   MessageReturnValue<VideoCaptureDeviceList> messageReturnValue(
-      message.packagedMessageProcessor(),
       returnValueOnFailure);
   sendSynchronousMessage<VideoCaptureDeviceList>(
-      message,
+      pMessage,
       m_messageQueue,
       messageReturnValue);
   if (!messageReturnValue) {

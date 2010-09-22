@@ -10,6 +10,7 @@ namespace VideoCapture {
 template<typename MessageSender> class MessageSenderFactory {
  public:
   typedef typename MessageSender::MessageType MessageType;
+  typedef boost::shared_ptr<MessageType> MessageSharedPtr;
   typedef MessageQueue<MessageType> MessageQueueType;
   typedef typename MessageQueueType::QueueImplType QueueImplType;
   typedef typename MessageQueueType::ImplPtr QueueImplPtr;

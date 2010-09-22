@@ -12,51 +12,54 @@ namespace VideoCapture {
 
 template<typename ReturnType> class SynchronousMessage : public Message {
  public:
+  typedef SynchronousMessage<ReturnType> SynchronousMessageType;
+  typedef boost::shared_ptr<SynchronousMessageType> SynchronousMessageSharedPtr;
   typedef boost::function<ReturnType ()> MessageProcessorType;
   typedef MessageReturnValue<ReturnType> MessageReturnValueType;
   typedef boost::packaged_task<ReturnType> PackagedTaskType;
-  typedef boost::shared_ptr<PackagedTaskType> PackagedTaskSharedPtr;
+  typedef boost::unique_future<ReturnType> UniqueFutureType;
 
   SynchronousMessage(const MessageProcessorType& messageProcessor)
       : Message(),
-        m_pPackagedMessageProcessor(new PackagedTaskType(messageProcessor)) {
+        m_packagedMessageProcessor(messageProcessor),
+        m_futureReturnValue(m_packagedMessageProcessor.get_future()) {
 
   }
 
   void processMessage() {
-    if (!isInitialized()) {
-      return;
+    m_packagedMessageProcessor();
+  }
+
+  void waitForMessageReturnValue(MessageReturnValueType& messageReturnValue) {
+    try {
+      m_futureReturnValue.wait();
+      if (m_futureReturnValue.has_exception()) {
+        messageReturnValue.setFailedReturnValue();
+        return;
+      }
+      if (!m_futureReturnValue.has_value()) {
+        messageReturnValue.setFailedReturnValue();
+        return;
+      }
+      messageReturnValue.setReturnValue(m_futureReturnValue.get());
+    } catch (boost::future_uninitialized exception) {
+      messageReturnValue.setFailedReturnValue();
+    } catch (boost::thread_interrupted exception) {
+      messageReturnValue.setFailedReturnValue();
     }
-    m_pPackagedMessageProcessor->operator()();
-  }
-
-  PackagedTaskSharedPtr packagedMessageProcessor() {
-    return m_pPackagedMessageProcessor;
-  }
-
-  bool isInitialized() const {
-    if (!m_pPackagedMessageProcessor) {
-      return false;
-    }
-
-    return true;
-  }
-
-  operator bool() const {
-    return isInitialized();
   }
 
  private:
-  PackagedTaskSharedPtr m_pPackagedMessageProcessor;
-
+  PackagedTaskType m_packagedMessageProcessor;
+  UniqueFutureType m_futureReturnValue;
 };
 
 template<typename ReturnType> void sendSynchronousMessage(
-    SynchronousMessage<ReturnType>& message,
+    boost::shared_ptr<SynchronousMessage<ReturnType>>& pMessage,
     MessageQueue<Message>& messageQueue,
     MessageReturnValue<ReturnType>& messageReturnValue) {
-  messageQueue.addMessage(message);
-  messageReturnValue.waitForMessageReturnValue();
+  messageQueue.addMessage(pMessage);
+  pMessage->waitForMessageReturnValue(messageReturnValue);
 }
 
 } // VideoCapture

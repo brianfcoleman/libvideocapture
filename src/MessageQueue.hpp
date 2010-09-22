@@ -10,7 +10,8 @@ namespace VideoCapture {
 
 template<typename MessageType> class MessageQueue {
  public:
-  typedef bounded_buffer<MessageType> QueueImplType;
+  typedef boost::shared_ptr<MessageType> MessageSharedPtr;
+  typedef bounded_buffer<MessageSharedPtr> QueueImplType;
   typedef typename QueueImplType::size_type SizeType;
   typedef boost::shared_ptr<QueueImplType> ImplPtr;
   typedef boost::weak_ptr<QueueImplType> ImplWeakPtr;
@@ -24,23 +25,23 @@ template<typename MessageType> class MessageQueue {
 
   }
 
-  bool addMessage(const MessageType& message) {
+  bool addMessage(const MessageSharedPtr& pMessage) {
     ImplPtr pImpl(lockImplPtr(m_pWeakImpl));
     if (!pImpl) {
       return false;
     }
-    pImpl->push_front(message);
+    pImpl->push_front(pMessage);
 
     return true;
   }
 
-  MessageType removeMessage() {
+  MessageSharedPtr removeMessage() {
     ImplPtr pImpl(lockImplPtr(m_pWeakImpl));
     if (!pImpl) {
-      MessageType emptyMessage;
-      return emptyMessage;
+      MessageSharedPtr pEmptyMessage;
+      return pEmptyMessage;
     }
-    return pImpl->pop_back(message);
+    return pImpl->pop_back();
   }
 
   bool isInitialized() const {
