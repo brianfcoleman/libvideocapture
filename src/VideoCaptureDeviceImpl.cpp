@@ -22,8 +22,7 @@ VideoCaptureDeviceImpl::VideoCaptureDeviceImpl(
     : m_isInitialized(false),
       m_name(s_kEmptyString),
       m_IID_ISampleGrabber(qeditTypeLibrary.IID_ISampleGrabber()),
-      m_IID_ISampleGrabberCB(
-          qeditTypeLibrary.IID_ISampleGrabberCB()),
+      m_IID_ISampleGrabberCB(qeditTypeLibrary.IID_ISampleGrabberCB()),
       m_pMoniker(pMoniker),
       m_pFilterGraph(createInstanceCOMInterface<IFilterGraph2>(
           CLSID_FilterGraph,
@@ -255,6 +254,11 @@ bool VideoCaptureDeviceImpl::initSampleGrabberCallback(
     return false;
   }
 
+  HRESULT result = m_pSampleGrabber->SetCallback(0, s_kUseBufferCB);
+  if (FAILED(result)) {
+    return false;
+  }
+
   SampleGrabberCallbackSharedPtr sampleGrabberCallbackPtr(
       new SampleGrabberCallback(
           m_IID_ISampleGrabberCB,
@@ -264,7 +268,7 @@ bool VideoCaptureDeviceImpl::initSampleGrabberCallback(
     return false;
   }
 
-  HRESULT result = m_pSampleGrabber->SetCallback(
+  result = m_pSampleGrabber->SetCallback(
       m_pSampleGrabberCallback.get(), s_kUseBufferCB);
   return SUCCEEDED(result);
 }
@@ -410,7 +414,7 @@ bool VideoCaptureDeviceImpl::isInitialized() const {
   return m_isInitialized;
 }
 
-const std::string VideoCaptureDeviceImpl::name() const {
+std::string VideoCaptureDeviceImpl::name() const {
   return m_name;
 }
 
@@ -470,7 +474,7 @@ double VideoCaptureDeviceImpl::countFramesCapturedPerSecond() const {
   return frameRate;
 }
 
-const VideoCaptureDeviceImpl::RGBVideoFormatList
+VideoCaptureDeviceImpl::RGBVideoFormatList
 VideoCaptureDeviceImpl::videoFormatList() const {
   if (!isInitialized()) {
     RGBVideoFormatList emptyList;
@@ -502,7 +506,7 @@ RGBVideoFormat VideoCaptureDeviceImpl::rgbVideoFormatFromPair(
   return rgbVideoFormat;
 }
 
-const RGBVideoFormat VideoCaptureDeviceImpl::currentVideoFormat() const {
+RGBVideoFormat VideoCaptureDeviceImpl::currentVideoFormat() const {
   if (!isInitialized()) {
     RGBVideoFormat rgbVideoFormat;
     return rgbVideoFormat;

@@ -11,6 +11,8 @@
 #include "boost/function.hpp"
 #include "RGBVideoFormat.hpp"
 #include "ByteBuffer.hpp"
+#include "Message.hpp"
+#include "MessageQueue.hpp"
 
 namespace VideoCapture {
 
@@ -23,16 +25,21 @@ class VideoCaptureDevice {
   typedef boost::function<void (ByteBuffer)> SampleProducerCallbackType;
   typedef std::list<SampleProducerCallbackType> SampleProducerCallbackList;
   typedef std::list<RGBVideoFormat> RGBVideoFormatList;
+  typedef Message MessageType;
+  typedef MessageQueue<MessageType> MessageQueueType;
+
   VideoCaptureDevice();
-  explicit VideoCaptureDevice(const ImplPtr& pImpl);
+  explicit VideoCaptureDevice(
+      const ImplPtr& pImpl,
+      const MessageQueueType& messageQueue);
   bool isInitialized() const;
-  const std::string name() const;
+  std::string name() const;
   bool startCapturing(
       const SampleProducerCallbackList& sampleProducerCallbackList);
   bool stopCapturing();
   double countFramesCapturedPerSecond() const;
-  const RGBVideoFormatList videoFormatList() const;
-  const RGBVideoFormat currentVideoFormat() const;
+  RGBVideoFormatList videoFormatList() const;
+  RGBVideoFormat currentVideoFormat() const;
   bool setCurrentVideoFormat(const RGBVideoFormat& videoFormat);
   operator bool() const {
     return isInitialized();
@@ -41,6 +48,7 @@ class VideoCaptureDevice {
   static const std::string s_kEmptyString;
   ImplPtr lockImplPtr() const;
   ImplWeakPtr m_pImpl;
+  mutable MessageQueueType m_messageQueue;
 };
 
 } // VideoCapture

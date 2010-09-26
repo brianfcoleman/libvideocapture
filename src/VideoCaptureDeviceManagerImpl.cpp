@@ -102,7 +102,7 @@ VideoCaptureDeviceManagerImpl::videoCaptureDeviceList() const {
        iterator != m_videoCaptureDeviceImplList.end();
        ++iterator) {
     VideoCaptureDeviceImplSharedPtr pImpl(*iterator);
-    VideoCaptureDevice videoCaptureDevice(pImpl);
+    VideoCaptureDevice videoCaptureDevice(pImpl, m_messageQueue);
     if (!videoCaptureDevice) {
       continue;
     }

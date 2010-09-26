@@ -51,13 +51,13 @@ class VideoCaptureDeviceImpl : private boost::noncopyable {
       UuidGenerator& uuidGenerator);
   ~VideoCaptureDeviceImpl();
   bool isInitialized() const;
-  const std::string name() const;
+  std::string name() const;
   bool startCapturing(
       const SampleProducerCallbackList& sampleProducerCallbackList);
   bool stopCapturing();
   double countFramesCapturedPerSecond() const;
-  const RGBVideoFormatList videoFormatList() const;
-  const RGBVideoFormat currentVideoFormat() const;
+  RGBVideoFormatList videoFormatList() const;
+  RGBVideoFormat currentVideoFormat() const;
   bool setCurrentVideoFormat(const RGBVideoFormat& videoFormat);
   operator bool() const {
     return isInitialized();

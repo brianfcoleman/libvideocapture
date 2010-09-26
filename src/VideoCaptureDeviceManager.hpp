@@ -30,7 +30,7 @@ class VideoCaptureDeviceManager {
       const ImplPtr& pImpl,
       const MessageQueueType& messageQueue,
       const MessageReceiverSharedPtr& pMessageReceiver);
-  const VideoCaptureDeviceList videoCaptureDeviceList() const;
+  VideoCaptureDeviceList videoCaptureDeviceList() const;
   bool isInitialized() const;
   operator bool() const {
     return isInitialized();

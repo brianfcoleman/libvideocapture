@@ -35,6 +35,10 @@ template<typename SampleSource, typename RawSampleData> class SampleProducer {
     pOutputSampleQueue->addSample(sample);
   }
 
+  void operator()(RawSampleData rawData) {
+    produceSample(rawData);
+  }
+
  private:
   SampleSourceType m_sampleSource;
   RawSampleDataConverter m_converter;

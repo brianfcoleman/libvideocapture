@@ -55,9 +55,14 @@ template<typename ReturnType> class SynchronousMessage : public Message {
 };
 
 template<typename ReturnType> void sendSynchronousMessage(
-    boost::shared_ptr<SynchronousMessage<ReturnType>>& pMessage,
+    boost::function<ReturnType ()> messageProcessor,
     MessageQueue<Message>& messageQueue,
     MessageReturnValue<ReturnType>& messageReturnValue) {
+  typedef SynchronousMessage<ReturnType> SynchronousMessageType;
+  typedef SynchronousMessageType::SynchronousMessageSharedPtr
+      SynchronousMessageSharedPtr;
+  SynchronousMessageSharedPtr pMessage(
+      new SynchronousMessageType(messageProcessor));
   messageQueue.addMessage(pMessage);
   pMessage->waitForMessageReturnValue(messageReturnValue);
 }
