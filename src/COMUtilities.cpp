@@ -28,6 +28,7 @@ const std::string utf8StringFromBasicString(const BSTR basicString) {
   if (!basicString) {
     return kEmptyString;
   }
+  // This length does not include a nul terminator
   UINT countCharsBasicString = SysStringLen(basicString);
   if (!countCharsBasicString) {
     return kEmptyString;
@@ -52,7 +53,10 @@ const std::string utf8StringFromBasicString(const BSTR basicString) {
   if (countBytesUTF8String <= 0) {
    return kEmptyString;
   }
-  boost::scoped_array<char> charArrayUTF8String(new char[countBytesUTF8String]);
+  // Allocate an extra char for the nul terminator
+  int countBytesUTF8StringWithNulTerminator = countBytesUTF8String + 1;
+  boost::scoped_array<char> charArrayUTF8String(
+      new char[countBytesUTF8StringWithNulTerminator]);
   if (!charArrayUTF8String) {
     return kEmptyString;
   }
@@ -66,6 +70,9 @@ const std::string utf8StringFromBasicString(const BSTR basicString) {
       countBytesUTF8String,
       pDefaultChar,
       pUsedDefaultChar);
+  // Append the nul terminator
+  int indexNulTerminator = countBytesUTF8StringWithNulTerminator - 1;
+  charArrayUTF8String[indexNulTerminator] = '\0';
   const std::string utf8String(charArrayUTF8String.get());
   return utf8String;
 }

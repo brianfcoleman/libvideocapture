@@ -26,7 +26,7 @@ class VideoFormatImpl : private boost::noncopyable {
   const Uuid uuid() const;
   double framesPerSecond() const;
   IntegerSize sizePixels() const;
-  Orientation orientation() const;
+  boost::int32_t angleRotationDegrees() const;
   std::size_t bitsPerPixel() const;
   std::size_t sizeBytes() const;
   std::size_t sizeRowBytes() const;
@@ -43,10 +43,10 @@ class VideoFormatImpl : private boost::noncopyable {
   Uuid m_uuid;
   double m_framesPerSecond;
   IntegerSize m_sizePixels;
-  Orientation m_orientation;
+  boost::int32_t m_angleRotationDegrees;
   boost::int32_t m_bitsPerPixel;
   bool m_uncompressedRGB;
-  RGBFormat m_RGBFormat;
+  RGBFormat m_rgbFormat;
   bool initialize(const boost::shared_ptr<IAMStreamConfig>& pStreamConfig,
                   const int index);
   bool extractData();

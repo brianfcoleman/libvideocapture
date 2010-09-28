@@ -10,18 +10,18 @@ IntegerSize::IntegerSize()
 }
 
 IntegerSize::IntegerSize(
-    const boost::int32_t& width,
-    const boost::int32_t& height)
+    const std::size_t& width,
+    const std::size_t& height)
     : m_width(width),
       m_height(height) {
 
 }
 
-boost::int32_t IntegerSize::width() const {
+std::size_t IntegerSize::width() const {
   return m_width;
 }
 
-boost::int32_t IntegerSize::height() const {
+std::size_t IntegerSize::height() const {
   return m_height;
 }
 

@@ -9,13 +9,13 @@ class IntegerSize {
  public:
   IntegerSize();
   IntegerSize(
-      const boost::int32_t& width,
-      const boost::int32_t& height);
-  boost::int32_t width() const;
-  boost::int32_t height() const;
+      const std::size_t& width,
+      const std::size_t& height);
+  std::size_t width() const;
+  std::size_t height() const;
  private:
-  boost::int32_t m_width;
-  boost::int32_t m_height;
+  std::size_t m_width;
+  std::size_t m_height;
 };
 
 std::ostream& operator<<(

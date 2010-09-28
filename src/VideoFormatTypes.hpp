@@ -2,6 +2,7 @@
 #define VIDEO_CAPTURE_VIDEO_FORMAT_TYPES
 
 #include "boost/gil/typedefs.hpp"
+#include "IntegerSize.hpp"
 
 namespace VideoCapture {
 typedef enum RGBFormat {
@@ -35,22 +36,6 @@ typedef enum RGBFormat {
   ABGR8888 = 3,
   RGBNone = 4
 } RGBFormat;
-
-typedef enum Orientation {
-  /**
-   * The first pixel when iterating forward through the pixels in the image
-   * corresponds to the top left of the image.
-   * i.e. the image is not upside down.
-   */
-  OrientationNonInverted = 0,
-  /**
-   * The first pixel when iterating forward through the pixels in the image
-   * corresponds to the bottom right of the image.
-   * i.e. the image is upside down.
-   */
-  OrientationInverted = 1,
-  OrientationNone = 2
-} Orientation;
 
 typedef boost::gil::rgb8_image_t rgb8_image_t;
 typedef boost::gil::rgb8_image_t rgba8_image_t;
@@ -96,6 +81,18 @@ typedef boost::gil::rgb8c_step_ptr_t rgb8c_step_ptr_t;
 typedef boost::gil::rgb8c_step_ptr_t rgba8c_step_ptr_t;
 typedef boost::gil::rgb8c_step_ptr_t bgr8c_step_ptr_t;
 typedef boost::gil::rgb8c_step_ptr_t abgr8c_step_ptr_t;
+
+const boost::int32_t kAngleFullRotationDegrees = 360;
+const boost::int32_t kAngleHalfRotationDegrees = 180;
+
+bool isValidRGBFormat(const RGBFormat rgbFormat);
+std::size_t bitsPerPixelForRGBFormat(const RGBFormat rgbFormat);
+std::size_t sizeBytesForRGBFormat(
+    const IntegerSize& sizePixels,
+    const RGBFormat rgbFormat);
+std::size_t sizeRowBytesForRGBFormat(
+    const IntegerSize& sizePixels,
+    const RGBFormat rgbFormat);
 
 } // VideoCapture
 

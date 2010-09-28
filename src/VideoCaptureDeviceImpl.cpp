@@ -502,7 +502,12 @@ RGBVideoFormat VideoCaptureDeviceImpl::rgbVideoFormatFromPair(
     RGBVideoFormat rgbVideoFormat;
     return rgbVideoFormat;
   }
-  RGBVideoFormat rgbVideoFormat(pVideoFormat);
+  VideoFormat videoFormat(pVideoFormat);
+  if (!videoFormat) {
+    RGBVideoFormat rgbVideoFormat;
+    return rgbVideoFormat;
+  }
+  RGBVideoFormat rgbVideoFormat(videoFormat);
   return rgbVideoFormat;
 }
 

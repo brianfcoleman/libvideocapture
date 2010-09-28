@@ -1,30 +1,25 @@
 #ifndef VIDEO_CAPTURE_RGB_VIDEO_FORMAT_H
 #define VIDEO_CAPTURE_RGB_VIDEO_FORMAT_H
 
-#include "boost/shared_ptr.hpp"
-#include "boost/weak_ptr.hpp"
-#include "boost/uuid/uuid.hpp"
-#include "boost/uuid/uuid_generators.hpp"
-#include "IntegerSize.hpp"
-#include "VideoFormatTypes.hpp"
+#include "VideoFormat.hpp"
 
 namespace VideoCapture {
 
-class VideoFormatImpl;
-
 class RGBVideoFormat {
  public:
-  typedef boost::shared_ptr<VideoFormatImpl> ImplPtr;
-  typedef boost::weak_ptr<VideoFormatImpl> ImplWeakPtr;
-  typedef boost::uuids::uuid Uuid;
-  typedef boost::uuids::nil_generator NilUuidGenerator;
+  typedef VideoFormat::Uuid Uuid;
+  typedef VideoFormat::NilUuidGenerator NilUuidGenerator;
   RGBVideoFormat();
-  explicit RGBVideoFormat(const ImplPtr& pImpl);
+  explicit RGBVideoFormat(const VideoFormat& videoFormat);
+  RGBVideoFormat(
+      const Uuid& uuid,
+      const IntegerSize sizePixels,
+      const boost::int32_t angleRotationDegrees,
+      const RGBFormat rgbFormat);
   bool isInitialized() const;
-  const Uuid uuid() const;
-  double framesPerSecond() const;
+  Uuid uuid() const;
   IntegerSize sizePixels() const;
-  Orientation orientation() const;
+  boost::int32_t angleRotationDegrees() const;
   std::size_t bitsPerPixel() const;
   std::size_t sizeBytes() const;
   std::size_t sizeRowBytes() const;
@@ -33,8 +28,12 @@ class RGBVideoFormat {
     return isInitialized();
   }
  private:
-  ImplPtr lockImplPtr() const;
-  ImplWeakPtr m_pImpl;
+  bool initialize();
+  bool m_isInitialized;
+  Uuid m_uuid;
+  IntegerSize m_sizePixels;
+  boost::int32_t m_angleRotationDegrees;
+  RGBFormat m_rgbFormat;
 };
 
 } // VideoCapture

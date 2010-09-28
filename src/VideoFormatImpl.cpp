@@ -3,18 +3,14 @@
 
 namespace VideoCapture {
 
-static const std::size_t kBitsPerByte = 8;
-
-static std::size_t convertBitsToBytes(std::size_t countBits);
-
 VideoFormatImpl::VideoFormatImpl()
     : m_isInitialized(false),
       m_uuid(NilUuidGenerator()()),
       m_framesPerSecond(0),
-      m_orientation(OrientationNone),
+      m_angleRotationDegrees(0),
       m_bitsPerPixel(0),
       m_uncompressedRGB(false),
-      m_RGBFormat(RGBNone) {
+      m_rgbFormat(RGBNone) {
 
 }
 
@@ -25,10 +21,10 @@ VideoFormatImpl::VideoFormatImpl(
     : m_isInitialized(false),
       m_uuid(uuid),
       m_framesPerSecond(0),
-      m_orientation(OrientationNone),
+      m_angleRotationDegrees(0),
       m_bitsPerPixel(0),
       m_uncompressedRGB(false),
-      m_RGBFormat(RGBNone) {
+      m_rgbFormat(RGBNone) {
   m_isInitialized = initialize(pStreamConfig, index);
 }
 
@@ -73,7 +69,7 @@ bool VideoFormatImpl::isRGBFormat() const {
     return false;
   }
 
-  if (m_RGBFormat == RGBNone) {
+  if (m_rgbFormat == RGBNone) {
     return false;
   }
 
@@ -124,9 +120,9 @@ bool VideoFormatImpl::extractData() {
   boost::int32_t widthPixels = bmiHeader.biWidth;
   boost::int32_t heightPixels = bmiHeader.biHeight;
   if (heightPixels >= 0) {
-    m_orientation = OrientationInverted;
+    m_angleRotationDegrees = kAngleHalfRotationDegrees;
   } else {
-    m_orientation = OrientationNonInverted;
+    m_angleRotationDegrees = 0;
     heightPixels = -heightPixels;
   }
   m_sizePixels = IntegerSize(widthPixels, heightPixels);
@@ -140,11 +136,11 @@ bool VideoFormatImpl::extractData() {
   }
 
   if (m_pMediaType->subtype == MEDIASUBTYPE_RGB24) {
-    m_RGBFormat = RGB888;
+    m_rgbFormat = RGB888;
   }
 
   if (m_pMediaType->subtype == MEDIASUBTYPE_RGB32) {
-    m_RGBFormat = RGBA8888;
+    m_rgbFormat = RGBA8888;
   }
 
   return true;
@@ -162,8 +158,8 @@ IntegerSize VideoFormatImpl::sizePixels() const {
   return m_sizePixels;
 }
 
-Orientation VideoFormatImpl::orientation() const {
-  return m_orientation;
+boost::int32_t VideoFormatImpl::angleRotationDegrees() const {
+  return m_angleRotationDegrees;
 }
 
 std::size_t VideoFormatImpl::bitsPerPixel() const {
@@ -175,23 +171,7 @@ std::size_t VideoFormatImpl::sizeBytes() const {
     return 0;
   }
 
-  if (m_sizePixels.width() <= 0) {
-    return 0;
-  }
-
-  if (m_sizePixels.height() <= 0) {
-    return 0;
-  }
-
-  if (m_bitsPerPixel == 0) {
-    return 0;
-  }
-
-  std::size_t countPixels = m_sizePixels.width() * m_sizePixels.height();
-  std::size_t sizeBits = m_bitsPerPixel * countPixels;
-
-  std::size_t sizeBytes = convertBitsToBytes(sizeBits);
-  return sizeBytes;
+  return sizeBytesForRGBFormat(m_sizePixels, m_rgbFormat);
 }
 
 std::size_t VideoFormatImpl::sizeRowBytes() const {
@@ -199,25 +179,11 @@ std::size_t VideoFormatImpl::sizeRowBytes() const {
     return false;
   }
 
-  if (m_sizePixels.width() <= 0) {
-    return 0;
-  }
-
-  if (m_sizePixels.height() <= 0) {
-    return 0;
-  }
-
-  if (m_bitsPerPixel == 0) {
-    return 0;
-  }
-
-  std::size_t sizeRowBits = m_bitsPerPixel * m_sizePixels.width();
-  std::size_t sizeRowBytes = convertBitsToBytes(sizeRowBits);
-  return sizeRowBytes;
+  return sizeRowBytesForRGBFormat(m_sizePixels, m_rgbFormat);
 }
 
 RGBFormat VideoFormatImpl::rgbFormat() const {
-  return m_RGBFormat;
+  return m_rgbFormat;
 }
 
 bool VideoFormatImpl::setMediaTypeOfStream(
@@ -249,16 +215,7 @@ std::ostream& operator<<(
   outputStream << "framesPerSecond: " << videoFormat.framesPerSecond()
                << std::endl;
   outputStream << "sizePixels: " << videoFormat.sizePixels();
-  switch (videoFormat.orientation()) {
-    case OrientationNonInverted:
-      outputStream << "orientation: OrientationNonInverted" << std::endl;
-      break;
-    case OrientationInverted:
-      outputStream << "orientation: OrientationInverted" << std::endl;
-      break;
-    default:
-      break;
-  }
+  outputStream << "angleRotationDegrees: " << videoFormat.angleRotationDegrees();
   outputStream << "bitsPerPixel: " << videoFormat.bitsPerPixel() << std::endl;
   switch (videoFormat.rgbFormat()) {
     case RGB888:
@@ -271,15 +228,6 @@ std::ostream& operator<<(
       break;
   }
   return outputStream;
-}
-
-static std::size_t convertBitsToBytes(std::size_t countBits) {
-  if ((countBits % kBitsPerByte) != 0) {
-    return 0;
-  }
-
-  std::size_t countBytes = countBits / kBitsPerByte;
-  return countBytes;
 }
 
 } // VideoCapture
