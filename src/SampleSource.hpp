@@ -1,55 +1,99 @@
 #ifndef VIDEO_CAPTURE_SAMPLE_SOURCE_H
 #define VIDEO_CAPTURE_SAMPLE_SOURCE_H
 
+#include "boost/cstdint.hpp"
+#include "RecyclingSampleQueuePair.hpp"
+
 namespace VideoCapture {
 
-#include "boost/cstdint.hpp"
-#include "boost/shared_ptr.hpp"
-#include "SampleQueue.hpp"
-
-template<typename Sample, typename SampleAllocator> class SampleSource {
+template<typename Sample> class SampleSource {
  public:
   typedef Sample SampleType;
-  typedef SampleAllocator SampleAllocatorType;
+  typedef typename SampleType::SampleAllocatorType SampleAllocatorType;
   typedef typename SampleType::SampleFormatType SampleFormatType;
   typedef typename SampleAllocatorType::SizeType SizeType;
-  typedef SampleQueue<SampleType> SampleQueueType;
-  typedef boost::shared_ptr<SampleQueueType> SampleQueueSharedPtr;
+  typedef typename SampleType::SampleFormatType SamplFormatType;
+  typedef RecyclingSampleQueuePair<SampleType> SampleQueuePairType;
+  typedef typename SampleQueuePairType::SampleQueueSharedPtr
+  SampleQueueSharedPtr;
+
+  SampleSource()
+      : m_sampleIndex(0) {
+
+  }
+
   SampleSource(
       const SizeType maxCountAllocatedSamples,
       const SampleFormatType& sampleFormat,
-      const SampleQueueSharedPtr& pOutputSampleQueue,
-      const SampleQueueSharedPtr& pRecycledSampleQueue)
+      const SampleQueuePairType& sampleQueuePair)
       : m_sampleAllocator(maxCountAllocatedSamples, sampleFormat),
-        m_pOutputSampleQueue(pOutputSampleQueue),
-        m_pRecycledSampleQueue(pRecycledSampleQueue),
+        m_sampleQueuePair(sampleQueuePair),
         m_sampleIndex(0) {
 
   }
 
+  SampleFormatType sampleFormat() {
+    return m_sampleAllocator.sampleFormat();
+  }
+
+  SampleQueuePairType sampleQueuePair() {
+    return m_sampleQueuePair;
+  }
+
   SampleType allocateSample() {
-    ++m_sampleIndex;
-    SampleType sample(m_sampleAllocator.allocateSample(m_sampleIndex));
-    if (sample) {
+    if (!isInitialized()) {
+      SampleType sample;
       return sample;
     }
-    SampleType recycledSample(m_pRecycledSampleQueue->removeSample());
-    return recycledSample;
+    recycleSample();
+    ++m_sampleIndex;
+    SampleType sample(m_sampleAllocator.allocateSample(m_sampleIndex));
+    return sample;
   }
 
-  SampleQueueSharedPtr outputSampleQueue() {
-    return m_pOutputSampleQueue;
+  void addSample(SampleType& sample) {
+    if (!sample) {
+      return;
+    }
+
+    if (!isInitialized()) {
+      return;
+    }
+
+    SampleQueueSharedPtr pSampleQueue(m_sampleQueuePair.sampleQueue());
+    if (!pSampleQueue) {
+      return;
+    }
+
+    pSampleQueue->addSample(sample);
   }
 
-  SampleQueueSharedPtr recycledSampleQueue() {
-    return m_pRecycledSampleQueue;
+  bool isInitialized() const {
+    if (!m_sampleAllocator) {
+      return false;
+    }
+
+    return true;
+  }
+
+  operator bool() const {
+    return isInitialized();
   }
 
  private:
+  void recycleSample() {
+    if (!isInitialized()) {
+      return;
+    }
+
+    m_sampleAllocator.recycleSample(m_sampleQueuePair);
+  }
+
   SampleAllocatorType m_sampleAllocator;
-  SampleQueueSharedPtr m_pOutputSampleQueue;
-  SampleQueueSharedPtr m_pRecycledSampleQueue;
+  SampleQueuePairType m_sampleQueuePair;
   boost::uint32_t m_sampleIndex;
+};
 
 } // VideoCapture
+
 #endif // VIDEO_CAPTURE_SAMPLE_SOURCE_H

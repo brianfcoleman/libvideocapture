@@ -123,8 +123,7 @@ bool VideoCaptureDeviceImpl::initCaptureGraph() {
     return false;
   }
 
-  SampleProducerCallbackList emptyList;
-  if (!initSampleGrabberCallback(emptyList)) {
+  if (!initSampleGrabberCallback()) {
     return false;
   }
 
@@ -247,9 +246,7 @@ bool VideoCaptureDeviceImpl::initSampleGrabber() {
   return true;
 }
 
-bool VideoCaptureDeviceImpl::initSampleGrabberCallback(
-    const VideoCaptureDeviceImpl::SampleProducerCallbackList&
-    sampleProducerCallbackList) {
+bool VideoCaptureDeviceImpl::initSampleGrabberCallback() {
   if (!m_pSampleGrabber) {
     return false;
   }
@@ -262,7 +259,7 @@ bool VideoCaptureDeviceImpl::initSampleGrabberCallback(
   SampleGrabberCallbackSharedPtr sampleGrabberCallbackPtr(
       new SampleGrabberCallback(
           m_IID_ISampleGrabberCB,
-          sampleProducerCallbackList));
+          m_sampleProducerCallbackSet));
   m_pSampleGrabberCallback = sampleGrabberCallbackPtr;
   if (!m_pSampleGrabberCallback) {
     return false;
@@ -418,8 +415,34 @@ std::string VideoCaptureDeviceImpl::name() const {
   return m_name;
 }
 
-bool VideoCaptureDeviceImpl::startCapturing(
-      const SampleProducerCallbackList& sampleProducerCallbackList) {
+bool VideoCaptureDeviceImpl::addSampleProducerCallback(
+    const VideoCaptureDeviceImpl::SampleProducerCallbackSharedPtr&
+    pSampleProducerCallback) {
+  typedef std::pair<SampleProducerCallbackSet::iterator, bool> ResultPairType;
+  if (!pSampleProducerCallback) {
+    return false;
+  }
+  ResultPairType resultPair(
+      m_sampleProducerCallbackSet.insert(pSampleProducerCallback));
+  bool isInserted = resultPair.second;
+  return isInserted;
+}
+
+bool VideoCaptureDeviceImpl::removeSampleProducerCallback(
+    const SampleProducerCallbackSharedPtr& pSampleProducerCallback) {
+  typedef SampleProducerCallbackSet::size_type SizeType;
+  if (!pSampleProducerCallback) {
+    return false;
+  }
+  if (m_sampleProducerCallbackSet.empty()) {
+    return false;
+  }
+  SizeType countRemoved = m_sampleProducerCallbackSet.erase(
+      pSampleProducerCallback);
+  return countRemoved;
+}
+
+bool VideoCaptureDeviceImpl::startCapturing() {
   if (!isInitialized()) {
     return false;
   }
@@ -428,7 +451,7 @@ bool VideoCaptureDeviceImpl::startCapturing(
     return false;
   }
 
-  if (!initSampleGrabberCallback(sampleProducerCallbackList)) {
+  if (!initSampleGrabberCallback()) {
     return false;
   }
 

@@ -39,6 +39,7 @@ template<
   void stopReceivingMessages() {
     m_thread.interrupt();
   }
+
   QueueImplPtr m_pMessageQueue;
   boost::thread m_thread;
 };
@@ -51,6 +52,7 @@ template<typename MessageSenderFactory> void receiveMessageLoop(
   typedef typename MessageSenderFactory::MessageQueueType MessageQueueType;
   typedef typename
       MessageSenderFactory::MessageSenderSharedPtr MessageSenderSharedPtr;
+
   try {
     MessageQueueType messageQueue(pMessageQueue);
     MessageSenderSharedPtr pMessageSender(messageSenderFactory(messageQueue));

@@ -1,9 +1,10 @@
 #ifndef VIDEO_CAPTURE_SAMPLE_GRABBER_CALLBACK_H
 #define VIDEO_CAPTURE_SAMPLE_GRABBER_CALLBACK_H
 
-#include <list>
+#include <set>
 #include "boost/utility.hpp"
 #include "boost/cstdint.hpp"
+#include "boost/shared_ptr.hpp"
 #include "DirectShow.hpp"
 // boost function must be included after DirectShow as DirectShow include
 // boost bind and boost mem_fn with stdcall enabled. If boost function
@@ -18,11 +19,14 @@ class SampleGrabberCallback
       private boost::noncopyable {
  public:
   typedef boost::function<void (ByteBuffer)> SampleProducerCallbackType;
-  typedef std::list<SampleProducerCallbackType> SampleProducerCallbackList;
-  typedef SampleProducerCallbackList::iterator SampleProducerCallbackIterator;
+  typedef boost::shared_ptr<
+    SampleProducerCallbackType> SampleProducerCallbackSharedPtr;
+  typedef std::set<SampleProducerCallbackSharedPtr> SampleProducerCallbackSet;
+  typedef SampleProducerCallbackSet::iterator SampleProducerCallbackIterator;
+
   SampleGrabberCallback(
       const IID& IID_ISampleGrabberCB,
-      const SampleProducerCallbackList& sampleProducerCallbackList);
+      const SampleProducerCallbackSet& sampleProducerCallbackSet);
   STDMETHODIMP_(ULONG) AddRef();
   STDMETHODIMP_(ULONG) Release();
   STDMETHODIMP QueryInterface(REFIID riid, void **ppvObject);
@@ -31,7 +35,7 @@ class SampleGrabberCallback
  private:
   boost::uint32_t m_refCount;
   IID m_IID_ISampleGrabberCB;
-  SampleProducerCallbackList m_sampleProducerCallbackList;
+  SampleProducerCallbackSet m_sampleProducerCallbackSet;
 };
 
 } // VideoCapture

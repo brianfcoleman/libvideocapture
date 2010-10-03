@@ -14,6 +14,9 @@ class RGBVideoFrameFactory {
   typedef boost::shared_ptr<RGBVideoFrame> SampleDataSharedPtr;
   RGBVideoFrameFactory();
   SampleDataSharedPtr createSampleData(const RGBVideoFormat& videoFormat);
+  SampleDataSharedPtr operator()(const RGBVideoFormat& videoFormat) {
+    return createSampleData(videoFormat);
+  }
 };
 
 } // VideoCapture

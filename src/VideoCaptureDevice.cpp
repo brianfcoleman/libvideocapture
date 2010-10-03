@@ -47,9 +47,53 @@ std::string VideoCaptureDevice::name() const {
   return messageReturnValue.returnValue();
 }
 
-bool VideoCaptureDevice::startCapturing(
-    const VideoCaptureDevice::SampleProducerCallbackList&
-    sampleProducerCallbackList) {
+bool VideoCaptureDevice::addSampleProducerCallback(
+    const VideoCaptureDevice::SampleProducerCallbackSharedPtr&
+    pSampleProducerCallback) {
+  typedef bool ReturnType;
+  typedef boost::function<ReturnType ()> MessageProcessorType;
+  typedef MessageReturnValue<ReturnType> MessageReturnValueType;
+  MessageReturnValueType messageReturnValue(false);
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
+    return messageReturnValue.returnValue();
+  }
+  MessageProcessorType messageProcessor(
+      boost::bind<ReturnType>(
+          &VideoCaptureDeviceImpl::addSampleProducerCallback,
+          pImpl,
+          pSampleProducerCallback));
+  sendSynchronousMessage(
+      messageProcessor,
+      m_messageQueue,
+      messageReturnValue);
+  return messageReturnValue.returnValue();
+}
+
+bool VideoCaptureDevice::removeSampleProducerCallback(
+    const VideoCaptureDevice::SampleProducerCallbackSharedPtr&
+    pSampleProducerCallback) {
+  typedef bool ReturnType;
+  typedef boost::function<ReturnType ()> MessageProcessorType;
+  typedef MessageReturnValue<ReturnType> MessageReturnValueType;
+  MessageReturnValueType messageReturnValue(false);
+  ImplPtr pImpl(lockImplPtr());
+  if (!pImpl) {
+    return messageReturnValue.returnValue();
+  }
+  MessageProcessorType messageProcessor(
+      boost::bind<ReturnType>(
+          &VideoCaptureDeviceImpl::removeSampleProducerCallback,
+          pImpl,
+          pSampleProducerCallback));
+  sendSynchronousMessage(
+      messageProcessor,
+      m_messageQueue,
+      messageReturnValue);
+  return messageReturnValue.returnValue();
+}
+
+bool VideoCaptureDevice::startCapturing() {
   typedef bool ReturnType;
   typedef boost::function<ReturnType ()> MessageProcessorType;
   typedef MessageReturnValue<ReturnType> MessageReturnValueType;
@@ -61,8 +105,7 @@ bool VideoCaptureDevice::startCapturing(
   MessageProcessorType messageProcessor(
       boost::bind<ReturnType>(
           &VideoCaptureDeviceImpl::startCapturing,
-          pImpl,
-          sampleProducerCallbackList));
+          pImpl));
   sendSynchronousMessage(
       messageProcessor,
       m_messageQueue,

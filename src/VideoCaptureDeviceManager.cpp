@@ -4,6 +4,7 @@
 #include "MessageReturnValue.hpp"
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
+#include "PimplUtilities.hpp"
 
 namespace VideoCapture {
 
@@ -15,7 +16,7 @@ VideoCaptureDeviceManager::VideoCaptureDeviceManager(
     const VideoCaptureDeviceManager::ImplPtr& pImpl,
     const VideoCaptureDeviceManager::MessageQueueType& messageQueue,
     const VideoCaptureDeviceManager::MessageReceiverSharedPtr& pMessageReceiver)
-    : m_pImpl(pImpl),
+    : m_pWeakImpl(pImpl),
       m_messageQueue(messageQueue),
       m_pMessageReceiver(pMessageReceiver) {
 
@@ -31,10 +32,14 @@ VideoCaptureDeviceManager::videoCaptureDeviceList() const {
   if (!isInitialized()) {
     return messageReturnValue.returnValue();
   }
+  ImplPtr pImpl(lockImplPtr(m_pWeakImpl));
+  if (!pImpl) {
+    return messageReturnValue.returnValue();
+  }
   MessageProcessorType messageProcessor(
       boost::bind<ReturnType>(
           &VideoCaptureDeviceManagerImpl::videoCaptureDeviceList,
-          m_pImpl));
+          pImpl));
   sendSynchronousMessage<ReturnType>(
       messageProcessor,
       m_messageQueue,
@@ -43,14 +48,7 @@ VideoCaptureDeviceManager::videoCaptureDeviceList() const {
 }
 
 bool VideoCaptureDeviceManager::isInitialized() const {
-  if (!m_pImpl) {
-    return false;
-  }
-  if (!m_pImpl->isInitialized()) {
-    return false;
-  }
-
-  return true;
+  return VideoCapture::isInitialized(m_pWeakImpl);
 }
 
 } // VideoCapture

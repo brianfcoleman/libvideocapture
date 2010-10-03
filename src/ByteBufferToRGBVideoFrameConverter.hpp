@@ -5,7 +5,7 @@
 
 namespace VideoCapture {
 
-template<Sample> class ByteBufferToRGBVideoFrameConverter {
+template<typename Sample> class ByteBufferToRGBVideoFrameConverter {
  public:
   typedef Sample SampleType;
   typedef SampleType& SampleRef;
@@ -17,7 +17,7 @@ template<Sample> class ByteBufferToRGBVideoFrameConverter {
 
   }
 
-  void operator(ByteBuffer buffer, SampleRef sample) {
+  void operator()(ByteBuffer buffer, SampleRef sample) {
     if (!sample) {
       return;
     }
@@ -25,7 +25,7 @@ template<Sample> class ByteBufferToRGBVideoFrameConverter {
     if (!videoFormat) {
       return;
     }
-    if (buffer.sizeBuffer() != videoFormat.sizeBytes()) {
+    if (buffer.sizeBytes() != videoFormat.sizeBytes()) {
       return;
     }
     RGBFormat rgbFormat = videoFormat.rgbFormat();
@@ -47,12 +47,13 @@ template<Sample> class ByteBufferToRGBVideoFrameConverter {
             buffer,
             sample);
     }
+  }
 
  private:
     template<
       typename RGBImageViewType,
       typename RGBPixelPtrType> static void copyBufferIntoSample(
-          buffer,
+          ByteBuffer buffer,
           SampleRef sample) {
       if (!sample) {
         return;
@@ -76,15 +77,14 @@ template<Sample> class ByteBufferToRGBVideoFrameConverter {
           sizePixels.height(),
           pFirstPixel,
           sizeRowBytes);
-      SampleGrabberCallback::SampleType::SampleDataSharedPtr pSampleData(
+      SampleDataSharedPtr pSampleData(
           sample.sampleData());
       RGBVideoFrame::ImageViewType imageViewSample(pSampleData->imageView());
       imageViewSample = imageViewBuffer;
     }
-  }
 
 };
 
 } // VideoCapture
 
-#ednif // VIDEO_CAPTURE_BYTE_BUFFER_TO_RGB_VIDEO_FRAME_CONVERTER_H
+#endif // VIDEO_CAPTURE_BYTE_BUFFER_TO_RGB_VIDEO_FRAME_CONVERTER_H

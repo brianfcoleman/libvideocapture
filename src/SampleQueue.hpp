@@ -16,9 +16,14 @@ template<typename Sample> class SampleQueue : private boost::noncopyable {
 
   }
 
-  virtual void addSample(const SampleType& sample) = 0;
+  virtual void addSample(const SampleType& sample) {
 
-  virtual SampleType removeSample() = 0;
+  }
+
+  virtual SampleType removeSample() {
+    SampleType sample;
+    return sample;
+  }
 };
 
 } // VideoCapture

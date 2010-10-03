@@ -29,8 +29,10 @@ class VideoCaptureDeviceImpl : private boost::noncopyable {
   typedef boost::shared_ptr<ISampleGrabber> ISampleGrabberSharedPtr;
   typedef boost::shared_ptr<
     SampleGrabberCallback> SampleGrabberCallbackSharedPtr;
-  typedef SampleGrabberCallback::SampleProducerCallbackList
-  SampleProducerCallbackList;
+  typedef SampleGrabberCallback::SampleProducerCallbackSharedPtr
+  SampleProducerCallbackSharedPtr;
+  typedef SampleGrabberCallback::SampleProducerCallbackSet
+  SampleProducerCallbackSet;
   typedef boost::shared_ptr<IMediaControl> IMediaControlSharedPtr;
   typedef boost::shared_ptr<IAMStreamConfig> IAMStreamConfigSharedPtr;
   typedef boost::shared_ptr<IAMVideoControl> IAMVideoControlSharedPtr;
@@ -52,8 +54,11 @@ class VideoCaptureDeviceImpl : private boost::noncopyable {
   ~VideoCaptureDeviceImpl();
   bool isInitialized() const;
   std::string name() const;
-  bool startCapturing(
-      const SampleProducerCallbackList& sampleProducerCallbackList);
+  bool addSampleProducerCallback(
+      const SampleProducerCallbackSharedPtr& pSampleProducerCallback);
+  bool removeSampleProducerCallback(
+      const SampleProducerCallbackSharedPtr& pSampleProducerCallback);
+  bool startCapturing();
   bool stopCapturing();
   double countFramesCapturedPerSecond() const;
   RGBVideoFormatList videoFormatList() const;
@@ -76,8 +81,7 @@ class VideoCaptureDeviceImpl : private boost::noncopyable {
   bool buildCaptureGraph();
   bool initCaptureGraphBuilder();
   bool initSampleGrabber();
-  bool initSampleGrabberCallback(
-      const SampleProducerCallbackList& sampleProducerCallbackList);
+  bool initSampleGrabberCallback();
   bool initMediaControl();
   bool initVideoControl();
   bool initCapturePin();
@@ -97,6 +101,7 @@ class VideoCaptureDeviceImpl : private boost::noncopyable {
   IBaseFilterSharedPtr m_pSampleGrabberFilter;
   IBaseFilterSharedPtr m_pNullRendererFilter;
   ISampleGrabberSharedPtr m_pSampleGrabber;
+  SampleProducerCallbackSet m_sampleProducerCallbackSet;
   SampleGrabberCallbackSharedPtr m_pSampleGrabberCallback;
   IMediaControlSharedPtr m_pMediaControl;
   IAMStreamConfigSharedPtr m_pStreamConfig;

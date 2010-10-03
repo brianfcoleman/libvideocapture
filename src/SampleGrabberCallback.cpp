@@ -1,13 +1,15 @@
 #include "SampleGrabberCallback.hpp"
+#include "PimplUtilities.hpp"
 
 namespace VideoCapture {
 
 SampleGrabberCallback::SampleGrabberCallback(
     const IID& IID_ISampleGrabberCB,
-    const SampleProducerCallbackList& sampleProducerCallbackList)
+    const SampleGrabberCallback::SampleProducerCallbackSet&
+    sampleProducerCallbackSet)
     : m_refCount(1),
       m_IID_ISampleGrabberCB(IID_ISampleGrabberCB),
-      m_sampleProducerCallbackList(sampleProducerCallbackList) {
+      m_sampleProducerCallbackSet(sampleProducerCallbackSet) {
 
 }
 
@@ -63,11 +65,14 @@ STDMETHODIMP SampleGrabberCallback::BufferCB(
   ByteBuffer buffer(pBuffer, BufferLen);
 
   for(SampleProducerCallbackIterator iterator(
-          m_sampleProducerCallbackList.begin());
-      iterator != m_sampleProducerCallbackList.end();
+          m_sampleProducerCallbackSet.begin());
+      iterator != m_sampleProducerCallbackSet.end();
       ++iterator) {
-    SampleProducerCallbackType callback(*iterator);
-    callback(buffer);
+    SampleProducerCallbackSharedPtr pCallback(*iterator);
+    if (!pCallback) {
+      continue;
+    }
+    pCallback->operator()(buffer);
   }
 
   return S_OK;

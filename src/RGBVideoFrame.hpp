@@ -4,11 +4,20 @@
 #include <boost/gil/extension/dynamic_image/dynamic_image_all.hpp>
 #include "boost/utility.hpp"
 #include "RGBVideoFormat.hpp"
+#include "RGBVideoFrameFactory.hpp"
+#include "ByteBufferToRGBVideoFrameConverter.hpp"
+#include "Sample.hpp"
 
 namespace VideoCapture {
 
 class RGBVideoFrame : private boost::noncopyable {
  public:
+  typedef RGBVideoFrame SampleDataType;
+  typedef Sample<SampleDataType> SampleType;
+  typedef ByteBufferToRGBVideoFrameConverter<SampleType> RawSampleDataConverter;
+  typedef RGBVideoFormat SampleFormatType;
+  typedef RGBVideoFrameFactory SampleDataFactory;
+
   typedef boost::mpl::vector<
     rgb8_image_t,
     rgba8_image_t,

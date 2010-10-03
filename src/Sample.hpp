@@ -3,17 +3,18 @@
 
 #include "boost/cstdint.hpp"
 #include "boost/shared_ptr.hpp"
+#include "SampleAllocator.hpp"
 
 namespace VideoCapture {
 
-template<
-  typename SampleData,
-  typename SampleFormat>
-class Sample {
+template<typename SampleData> class Sample {
  public:
-  typedef typename SampleData SampleDataType;
-  typedef typename SampleFormat SampleFormatType;
-  typedef typename boost::shared_ptr<SampleData> SampleDataSharedPtr;
+  typedef SampleData SampleDataType;
+  typedef typename SampleDataType::SampleFormatType SampleFormatType;
+  typedef Sample<SampleDataType> SampleType;
+  typedef SampleAllocator<SampleType> SampleAllocatorType;
+  typedef boost::shared_ptr<SampleDataType> SampleDataSharedPtr;
+
   Sample()
       : m_sampleIndex(0) {
 
@@ -21,7 +22,7 @@ class Sample {
 
   Sample(
       const boost::uint32_t sampleIndex,
-      const SampleFormat& sampleFormat,
+      const SampleFormatType& sampleFormat,
       const SampleDataSharedPtr& pSampleData)
       : m_sampleIndex(sampleIndex),
         m_sampleFormat(sampleFormat),
@@ -33,15 +34,10 @@ class Sample {
     return m_sampleIndex;
   }
 
-  SampleFormat sampleFormat() const {
+  SampleFormatType sampleFormat() const {
     return m_sampleFormat;
   }
 
-  /**
-   * The sample data is recycled as soon as the sample goes out of scope.
-   * Do not retain a reference to sample data
-   * or attempt to use it after it has been recycled.
-   */
   SampleDataSharedPtr sampleData() {
     return SampleDataSharedPtr(m_pSampleData);
   }
@@ -64,7 +60,7 @@ class Sample {
 
  private:
   boost::uint32_t m_sampleIndex;
-  SampleFormat m_sampleFormat;
+  SampleFormatType m_sampleFormat;
   SampleDataSharedPtr m_pSampleData;
 };
 

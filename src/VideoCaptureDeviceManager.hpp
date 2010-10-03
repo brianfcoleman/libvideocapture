@@ -2,6 +2,7 @@
 #define VIDEO_CAPTURE_VIDEO_CAPTURE_DEVICE_MANAGER_H
 
 #include <list>
+#include "boost/weak_ptr.hpp"
 #include "boost/shared_ptr.hpp"
 #include "boost/function.hpp"
 #include "MessageSenderFactory.hpp"
@@ -16,6 +17,7 @@ class VideoCaptureDeviceManagerImpl;
 
 class VideoCaptureDeviceManager {
  public:
+  typedef boost::weak_ptr<VideoCaptureDeviceManagerImpl> ImplWeakPtr;
   typedef boost::shared_ptr<VideoCaptureDeviceManagerImpl> ImplPtr;
   typedef Message MessageType;
   typedef MessageQueue<MessageType> MessageQueueType;
@@ -36,7 +38,7 @@ class VideoCaptureDeviceManager {
     return isInitialized();
   }
  private:
-  ImplPtr m_pImpl;
+  ImplWeakPtr m_pWeakImpl;
   mutable MessageQueueType m_messageQueue;
   MessageReceiverSharedPtr m_pMessageReceiver;
 };

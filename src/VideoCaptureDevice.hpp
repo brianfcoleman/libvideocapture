@@ -6,6 +6,7 @@
 
 #include <string>
 #include <list>
+#include <set>
 #include "boost/shared_ptr.hpp"
 #include "boost/weak_ptr.hpp"
 #include "boost/function.hpp"
@@ -23,10 +24,13 @@ class VideoCaptureDevice {
   typedef boost::shared_ptr<VideoCaptureDeviceImpl> ImplPtr;
   typedef boost::weak_ptr<VideoCaptureDeviceImpl> ImplWeakPtr;
   typedef boost::function<void (ByteBuffer)> SampleProducerCallbackType;
-  typedef std::list<SampleProducerCallbackType> SampleProducerCallbackList;
+  typedef boost::shared_ptr<
+    SampleProducerCallbackType> SampleProducerCallbackSharedPtr;
+  typedef std::set<SampleProducerCallbackSharedPtr> SampleProducerCallbackSet;
   typedef std::list<RGBVideoFormat> RGBVideoFormatList;
   typedef Message MessageType;
   typedef MessageQueue<MessageType> MessageQueueType;
+  typedef ByteBuffer RawSampleDataType;
 
   VideoCaptureDevice();
   explicit VideoCaptureDevice(
@@ -34,8 +38,11 @@ class VideoCaptureDevice {
       const MessageQueueType& messageQueue);
   bool isInitialized() const;
   std::string name() const;
-  bool startCapturing(
-      const SampleProducerCallbackList& sampleProducerCallbackList);
+  bool addSampleProducerCallback(
+      const SampleProducerCallbackSharedPtr& pSampleProducerCallback);
+  bool removeSampleProducerCallback(
+      const SampleProducerCallbackSharedPtr& pSampleProducerCallback);
+  bool startCapturing();
   bool stopCapturing();
   double countFramesCapturedPerSecond() const;
   RGBVideoFormatList videoFormatList() const;
