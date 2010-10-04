@@ -28,6 +28,7 @@ template<
     }
 
     m_sampleSource = sampleSource;
+    m_hasSampleSource = true;
 
     return true;
   }
@@ -38,6 +39,7 @@ template<
     }
 
     m_sampleSink = sampleSink;
+    m_hasSampleSink = true;
 
     return true;
   }
@@ -53,11 +55,11 @@ template<
       return false;
     }
 
-    if (!m_hasSampleSink) {
+    if (!hasSampleProcessors()) {
       return false;
     }
 
-    if (!hasSampleProcessors()) {
+    if (!m_hasSampleSink) {
       return false;
     }
 
