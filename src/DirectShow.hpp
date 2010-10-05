@@ -20,13 +20,13 @@ DECLARE_INTERFACE_ (ISampleGrabberCB, IUnknown) {
   STDMETHOD_ (ULONG, AddRef) (THIS) PURE;
   STDMETHOD_ (ULONG, Release) (THIS) PURE;
 
+  STDMETHOD (SampleCB) (THIS_
+                        double SampleTime,
+                        IMediaSample *pSample) PURE;
   STDMETHOD (BufferCB) (THIS_
                         double SampleTime,
                         BYTE *pBuffer,
                         long BufferLen) PURE;
-  STDMETHOD (SampleCB) (THIS_
-                        double SampleTime,
-                        IMediaSample *pSample) PURE;
 };
 
 #undef INTERFACE

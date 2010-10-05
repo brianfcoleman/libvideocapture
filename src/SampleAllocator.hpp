@@ -30,7 +30,7 @@ template<typename Sample> class SampleAllocator {
       const SizeType maxCountAllocatedSamples,
       SampleFormatType sampleFormat)
       : m_pSampleDataContainer(
-          new SampleDataContainerType(maxCountAllocatedSamples)),
+          new SampleDataContainerType()),
         m_sampleFormat(sampleFormat) {
       allocateSampleData(maxCountAllocatedSamples);
   }
@@ -40,12 +40,17 @@ template<typename Sample> class SampleAllocator {
       SampleType sample;
       return sample;
     }
-    if (canAllocateSample()) {
+    if (!canAllocateSample()) {
       SampleType sample;
       return sample;
     }
     SampleDataSharedPtr pSampleData(m_pSampleDataContainer->back());
     m_pSampleDataContainer->pop_back();
+#ifdef DEBUG
+    std::cout << "SampleAllocator::allocateSample ";
+    std::cout << (pSampleData ? "" : "null ") << "sample data";
+    std::cout << std::endl;
+#endif
     SampleType sample(sampleIndex, m_sampleFormat, pSampleData);
     return sample;
   }
@@ -55,7 +60,11 @@ template<typename Sample> class SampleAllocator {
       return false;
     }
 
-    return m_pSampleDataContainer->empty();
+    if (m_pSampleDataContainer->empty()) {
+      return false;
+    }
+
+    return true;
   }
 
   void recycleSample(SampleQueuePairType& sampleQueuePair) {
@@ -126,6 +135,12 @@ template<typename Sample> class SampleAllocator {
       SampleDataSharedPtr pSampleData(
           sampleDataFactory(m_sampleFormat));
       m_pSampleDataContainer->push_front(pSampleData);
+#ifdef DEBUG
+    std::cout << "SampleAllocator::allocateSampleData ";
+    std::cout << (pSampleData ? "" : "null ") << "sample data ";
+    std::cout << pSampleData.get() << std::endl;
+    std::cout << "size " << m_pSampleDataContainer->size() << std::endl;
+#endif
     }
   }
 };

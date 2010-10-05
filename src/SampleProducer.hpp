@@ -33,7 +33,13 @@ template<
     if (!sample) {
       return;
     }
+#ifdef DEBUG
+    std::cout << "SampleProducer::produceSample converting sample" << std::endl;
+#endif
     m_converter(rawData, sample);
+#ifdef DEBUG
+    std::cout << "SampleProducer::produceSample adding sample" << std::endl;
+#endif
     m_sampleSource.addSample(sample);
   }
 

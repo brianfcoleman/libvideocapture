@@ -1,6 +1,10 @@
 #include "SampleGrabberCallback.hpp"
 #include "PimplUtilities.hpp"
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 namespace VideoCapture {
 
 SampleGrabberCallback::SampleGrabberCallback(
@@ -47,6 +51,9 @@ STDMETHODIMP SampleGrabberCallback::QueryInterface(
 STDMETHODIMP SampleGrabberCallback::SampleCB(
     double Time,
     IMediaSample *pSample) {
+#ifdef DEBUG
+  std::cout << "SampleGrabberCallback::SampleCB" << std::endl;
+#endif
   return E_NOTIMPL;
 }
 
@@ -54,6 +61,9 @@ STDMETHODIMP SampleGrabberCallback::BufferCB(
     double Time,
     BYTE *pBuffer,
     long BufferLen) {
+#ifdef DEBUG
+  std::cout << "SampleGrabberCallback::BufferCB" << std::endl;
+#endif
   if (!pBuffer) {
     return S_FALSE;
   }

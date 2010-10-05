@@ -49,7 +49,14 @@ template<typename InputSample,
         m_sampleAllocator(
             maxCountAllocatedSamples,
             m_pSampleConverter->convertedSampleFormat(inputSampleFormat)) {
-
+#ifdef DEBUG
+    OutputSampleFormatType convertedSampleFormat(
+        m_sampleAllocator.sampleFormat());
+    std::cout << "SampleProcessor " << (inputSampleFormat ? "valid" : "invalid");
+    std::cout << " input sample format" << std::endl;
+    std::cout << (convertedSampleFormat ? "valid" : "invalid");
+    std::cout << " converted sample format" << std::endl;
+#endif
   }
 
   OutputSampleFormatType sampleFormat() {
@@ -86,6 +93,10 @@ template<typename InputSample,
       return;
     }
     boost::uint32_t sampleIndex = inputSample.sampleIndex();
+#ifdef DEBUG
+    std::cout << "SampleProcessor::processSample removed input sample";
+    std::cout << std::endl;
+#endif
 
     OutputSampleType outputSample(allocateOutputSample(sampleIndex));
     if (!outputSample) {

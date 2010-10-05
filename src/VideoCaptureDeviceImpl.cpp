@@ -251,7 +251,9 @@ bool VideoCaptureDeviceImpl::initSampleGrabberCallback() {
     return false;
   }
 
-  HRESULT result = m_pSampleGrabber->SetCallback(0, s_kUseBufferCB);
+  HRESULT result = m_pSampleGrabber->SetCallback(
+      0,
+      VideoCaptureDeviceImpl::s_kUseBufferCB);
   if (FAILED(result)) {
     return false;
   }
@@ -266,7 +268,14 @@ bool VideoCaptureDeviceImpl::initSampleGrabberCallback() {
   }
 
   result = m_pSampleGrabber->SetCallback(
-      m_pSampleGrabberCallback.get(), s_kUseBufferCB);
+      m_pSampleGrabberCallback.get(),
+      VideoCaptureDeviceImpl::s_kUseBufferCB);
+
+#ifdef DEBUG
+  std::cout << "VideoCaptureDeviceImpl::initSampleGrabberCallback ";
+  std::cout << (SUCCEEDED(result) ? "set" : "not set") << std::endl;
+#endif
+
   return SUCCEEDED(result);
 }
 
@@ -456,6 +465,7 @@ bool VideoCaptureDeviceImpl::startCapturing() {
   }
 
   HRESULT result = m_pMediaControl->Run();
+
   return SUCCEEDED(result);
 }
 
@@ -588,6 +598,8 @@ bool VideoCaptureDeviceImpl::setCurrentVideoFormat(
   if (!pVideoFormat) {
     return false;
   }
+
+  m_currentVideoFormatUuid = uuidVideoFormatPair.first;
 
   if (!pVideoFormat->setMediaTypeOfStream(m_pStreamConfig)) {
     return false;

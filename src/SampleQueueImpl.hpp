@@ -14,7 +14,7 @@ template<typename Sample> class SampleQueueImpl : public SampleQueue<Sample> {
   typedef typename SampleContainerType::size_type SizeType;
 
   explicit SampleQueueImpl(const SizeType capacity)
-      : m_sampleContainer(capacity) {
+      : m_sampleContainer() {
 
   }
 

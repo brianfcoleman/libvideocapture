@@ -41,6 +41,9 @@ template<typename Sample> class SampleSource {
   }
 
   SampleType allocateSample() {
+#ifdef DEBUG
+    std::cout << "SampleSource::allocateSample" << std::endl;
+#endif
     if (!isInitialized()) {
       SampleType sample;
       return sample;

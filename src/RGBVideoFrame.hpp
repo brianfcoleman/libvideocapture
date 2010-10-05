@@ -25,40 +25,18 @@ class RGBVideoFrame : private boost::noncopyable {
     abgr8_image_t> SupportedImageType;
   typedef boost::gil::any_image<SupportedImageType> ImageType;
 
-  typedef boost::mpl::vector<
-    rgb8_view_t,
-    rgba8_view_t,
-    bgr8_view_t,
-    abgr8_view_t> SupportedImageViewType;
-  typedef boost::gil::any_image_view<SupportedImageViewType> ImageViewType;
+  typedef ImageType::view_t ImageViewType;
+  typedef ImageType::const_view_t ConstantImageViewType;
 
-  typedef boost::mpl::vector<
-    rgb8c_view_t,
-    rgba8c_view_t,
-    bgr8c_view_t,
-    abgr8c_view_t> SupportedConstantImageViewType;
-  typedef boost::gil::any_image_view<
-    SupportedConstantImageViewType> ConstantImageViewType;
+  template<typename RGBImageType> explicit RGBVideoFrame(RGBImageType& rgbImage)
+      : m_image(rgbImage) {
 
-  typedef boost::mpl::vector<
-    rgb8_step_view_t,
-    rgba8_step_view_t,
-    bgr8_step_view_t,
-    abgr8_step_view_t> SupportedStepImageViewType;
-  typedef boost::gil::any_image_view<
-    SupportedStepImageViewType> StepImageViewType;
+  }
 
-  explicit RGBVideoFrame(const RGBVideoFormat& videoFormat);
   ImageViewType imageView();
   ConstantImageViewType constImageView() const;
-  bool isInitialized() const;
-  operator bool() const {
-    return isInitialized();
-  }
  private:
-  bool initialize(const RGBVideoFormat& videoFormat);
   ImageType m_image;
-  bool m_isInitialized;
 };
 
 } // VideoCapture

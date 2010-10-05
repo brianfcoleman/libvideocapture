@@ -48,6 +48,9 @@ template<typename SampleData> class Sample {
     }
 
     if (!m_pSampleData) {
+#ifdef DEBUG
+    std::cout << "Sample::isInitialized sample data null" << std::endl;
+#endif
       return false;
     }
 

@@ -81,6 +81,12 @@ template<
     // instead of currentVideoFormat
     SampleFormatType currentCaptureDeviceSampleFormat(
         captureDevice.currentVideoFormat());
+#ifdef DEBUG
+    bool isFormatInitialized = currentCaptureDeviceSampleFormat.isInitialized();
+    std::cout << "SampleStreamBuilder::connectSampleSource current format";
+    std::cout << (isFormatInitialized ? " is " : " is not ");
+    std::cout << "initialized" << std::endl;
+#endif
     SampleQueuePairType threadSafeSampleQueuePair(
         threadSafeRecyclingSampleQueuePair<
           SampleType>(m_maxCountAllocatedSamples));
@@ -132,7 +138,8 @@ template<
         SampleConverterSharedPtr;
     typedef SampleProcessor<SampleType, SampleType> SampleProcessorType;
 
-    SampleConverterSharedPtr pSampleConverter(new SampleConverterType());
+    SampleConverterSharedPtr pSampleConverter(
+        sampleConverterSharedPtr<SampleType, SampleType, SampleConverterType>());
     SampleQueuePairType sampleQueuePair(
         threadSafeRecyclingSampleQueuePair<
           SampleType>(m_maxCountAllocatedSamples));

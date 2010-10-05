@@ -17,6 +17,10 @@ int main() {
   typedef RGBVideoSampleStreamBuilder::SampleSinkType SampleSinkType;
   typedef RGBVideoSampleStreamBuilder::SampleStreamType RGBVideoSampleStream;
 
+#ifdef DEBUG
+  std::cout << "Debug" << std::endl;
+#endif
+
   VideoCaptureDeviceManagerFactory videoCaptureDeviceManagerFactory;
   VideoCaptureDeviceManager videoCaptureDeviceManager(
       videoCaptureDeviceManagerFactory());
@@ -32,6 +36,10 @@ int main() {
   size_type countVideoFormats = videoFormatList.size();
   std::cout << "Found " << countVideoFormats;
   std::cout << " video formats" << std::endl;
+  RGBVideoFormat videoFormat(videoFormatList.front());
+  bool isInitialized = videoFormat.isInitialized();
+  std::cout << "video format " << (isInitialized ? "is " : "is not ");
+  std::cout << "initialized" << std::endl;
 
   RGBVideoSampleStreamBuilder sampleStreamBuilder(
       RGBVideoSampleStreamBuilder::s_kDefaultMaxCountAllocatedSamples);
@@ -47,6 +55,16 @@ int main() {
   bool didStart = videoCaptureDevice.startCapturing();
   std::cout << (didStart ? "Did start" : "Did not start");
   std::cout << " capturing" << std::endl;
+
+  std::cout << "Removing sample from sample sink" << std::endl;
+  RGBVideoSample sample(sampleSink.removeSample());
+  std::cout << "Removed sample from sample sink" << std::endl;
+  bool isValidSample = sample;
+  std::cout << (isValidSample ? "isValidSample" : "not isValidSample");
+  std::cout << std::endl;
+  std::cout << "Recycling sample" << std::endl;
+  sampleSink.recycleSample(sample);
+  std::cout << "Recycled sample" << std::endl;
 
   return EXIT_SUCCESS;
 }

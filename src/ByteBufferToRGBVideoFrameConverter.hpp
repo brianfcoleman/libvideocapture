@@ -18,6 +18,9 @@ template<typename Sample> class ByteBufferToRGBVideoFrameConverter {
   }
 
   void operator()(ByteBuffer buffer, SampleRef sample) {
+#ifdef DEBUG
+    std::cout << "ByteBufferToRGBVideoFrameConverter" << std::endl;
+#endif
     if (!sample) {
       return;
     }
@@ -34,18 +37,22 @@ template<typename Sample> class ByteBufferToRGBVideoFrameConverter {
         copyBufferIntoSample<rgb8c_view_t, rgb8c_ptr_t>(
             buffer,
             sample);
+        return;
       case RGBA8888:
         copyBufferIntoSample<rgba8c_view_t, rgba8c_ptr_t>(
             buffer,
             sample);
+        return;
       case BGR888:
         copyBufferIntoSample<bgr8c_view_t, bgr8c_ptr_t>(
             buffer,
             sample);
+        return;
       case ABGR8888:
         copyBufferIntoSample<abgr8c_view_t, abgr8c_ptr_t>(
             buffer,
             sample);
+        return;
     }
   }
 
@@ -55,10 +62,17 @@ template<typename Sample> class ByteBufferToRGBVideoFrameConverter {
       typename RGBPixelPtrType> static void copyBufferIntoSample(
           ByteBuffer buffer,
           SampleRef sample) {
+#ifdef DEBUG
+    std::cout << "copyBufferIntoSample" << std::endl;
+#endif
       if (!sample) {
         return;
       }
       RGBVideoFormat videoFormat(sample.sampleFormat());
+      std::size_t sizeBytes = videoFormat.sizeBytes();
+      if (sizeBytes != buffer.sizeBytes()) {
+        return;
+      }
       IntegerSize sizePixels(videoFormat.sizePixels());
       if (sizePixels.width() <= 0) {
         return;
@@ -77,10 +91,21 @@ template<typename Sample> class ByteBufferToRGBVideoFrameConverter {
           sizePixels.height(),
           pFirstPixel,
           sizeRowBytes);
-      SampleDataSharedPtr pSampleData(
-          sample.sampleData());
+#ifdef DEBUG
+    std::cout << "created imageViewBuffer" << std::endl;
+#endif
+      SampleDataSharedPtr pSampleData(sample.sampleData());
+#ifdef DEBUG
+      std::cout << "pSampleData " << pSampleData.get() << std::endl;
+#endif
       RGBVideoFrame::ImageViewType imageViewSample(pSampleData->imageView());
-      imageViewSample = imageViewBuffer;
+#ifdef DEBUG
+      std::cout << "created imageViewSample" << std::endl;
+#endif
+      boost::gil::copy_pixels(imageViewBuffer, imageViewSample);
+#ifdef DEBUG
+      std::cout << "Assigned image view buffer to sample" << std::endl;
+#endif
     }
 
 };
