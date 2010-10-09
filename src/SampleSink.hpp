@@ -1,6 +1,8 @@
 #ifndef VIDEO_CAPTURE_SAMPLE_SINK_H
 #define VIDEO_CAPTURE_SAMPLE_SINK_H
 
+#include "RecyclingSampleQueuePair.hpp"
+
 namespace VideoCapture {
 
 template<typename Sample> class SampleSink {

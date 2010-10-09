@@ -18,6 +18,10 @@ class IntegerSize {
   std::size_t m_height;
 };
 
+bool operator==(const IntegerSize& lhs, const IntegerSize& rhs);
+
+bool operator!=(const IntegerSize& lhs, const IntegerSize& rhs);
+
 std::ostream& operator<<(
     std::ostream& outputStream,
     const IntegerSize& integerSize);

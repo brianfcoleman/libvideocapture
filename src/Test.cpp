@@ -2,6 +2,8 @@
 #include "VideoCaptureDeviceManagerFactory.hpp"
 #include "SampleStreamBuilder.hpp"
 #include "RGBVideoFrame.hpp"
+#include "SDLSampleConsumerCallback.hpp"
+#include "SDLVideoManagerFactory.hpp"
 
 int main() {
   using namespace VideoCapture;
@@ -14,7 +16,7 @@ int main() {
     RGBVideoSample,
     RGBVideoSample> RGBVideoSampleStreamBuilder;
   typedef RGBVideoSampleStreamBuilder::SampleSourceType SampleSourceType;
-  typedef RGBVideoSampleStreamBuilder::SampleSinkType SampleSinkType;
+  typedef RGBVideoSampleStreamBuilder::SampleConsumerType SampleConsumerType;
   typedef RGBVideoSampleStreamBuilder::SampleStreamType RGBVideoSampleStream;
 
 #ifdef DEBUG
@@ -41,12 +43,25 @@ int main() {
   std::cout << "video format " << (isInitialized ? "is " : "is not ");
   std::cout << "initialized" << std::endl;
 
+  SDLVideoManagerFactory sdlVideoManangerFactory;
+  SDLVideoManager sdlVideoManager(sdlVideoManangerFactory());
+
+  std::cout << "sdl video manager " << (sdlVideoManager ? "" : "not");
+  std::cout << " is initialized" << std::endl;
+
+  sdlVideoManager.startEventProcessor();
+  RGBVideoFormat currentVideoFormat(videoCaptureDevice.currentVideoFormat());
+  sdlVideoManager.setVideoMode(currentVideoFormat);
+
   RGBVideoSampleStreamBuilder sampleStreamBuilder(
       RGBVideoSampleStreamBuilder::s_kDefaultMaxCountAllocatedSamples);
   SampleSourceType sampleSource(
       sampleStreamBuilder.connectSampleSource(videoCaptureDevice));
-  SampleSinkType sampleSink(
-      sampleStreamBuilder.connectSampleSink(sampleSource));
+  SDLSampleConsumerCallback sampleConsumerCallback(sdlVideoManager);
+  SampleConsumerType sampleConsumer(
+      sampleStreamBuilder.connectSampleSinkToPreviousSampleStage(
+          sampleSource,
+          sampleConsumerCallback));
   bool isReadyToBuild = sampleStreamBuilder.isReadyToBuild();
   std::cout << (isReadyToBuild ? "isReadyToBuild" : "not isReadyToBuild");
   std::cout << std::endl;
@@ -56,15 +71,7 @@ int main() {
   std::cout << (didStart ? "Did start" : "Did not start");
   std::cout << " capturing" << std::endl;
 
-  std::cout << "Removing sample from sample sink" << std::endl;
-  RGBVideoSample sample(sampleSink.removeSample());
-  std::cout << "Removed sample from sample sink" << std::endl;
-  bool isValidSample = sample;
-  std::cout << (isValidSample ? "isValidSample" : "not isValidSample");
-  std::cout << std::endl;
-  std::cout << "Recycling sample" << std::endl;
-  sampleSink.recycleSample(sample);
-  std::cout << "Recycled sample" << std::endl;
+  sdlVideoManager.waitForQuitEvent();
 
   return EXIT_SUCCESS;
 }

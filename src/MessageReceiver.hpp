@@ -5,6 +5,7 @@
 #include "boost/thread.hpp"
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
+#include "boost/shared_ptr.hpp"
 #include "MessageQueue.hpp"
 
 namespace VideoCapture {
@@ -18,6 +19,8 @@ template<
   typedef typename MessageQueueType::QueueImplType QueueImplType;
   typedef typename MessageQueueType::ImplPtr QueueImplPtr;
   typedef typename MessageQueueType::SizeType SizeType;
+  typedef MessageReceiver<MessageSenderFactory> MessageReceiverType;
+  typedef boost::shared_ptr<MessageReceiverType> MessageReceiverSharedPtr;
 
   MessageReceiver(
       const SizeType maxSizeMessageQueue,

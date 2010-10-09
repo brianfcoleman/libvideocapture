@@ -10,6 +10,7 @@
 #include "SampleProcessor.hpp"
 #include "SampleProducer.hpp"
 #include "SampleStream.hpp"
+#include "SampleConsumerFactory.hpp"
 
 namespace VideoCapture {
 
@@ -31,6 +32,9 @@ template<
   typedef typename SampleStreamType::ProcessorThreadSharedPtr
   ProcessorThreadSharedPtr;
   typedef std::size_t SizeType;
+  typedef SampleConsumer<LastSampleType> SampleConsumerType;
+  typedef typename SampleConsumerType::SampleConsumerCallback
+  SampleConsumerCallback;
 
   static const SizeType s_kDefaultMaxCountAllocatedSamples = 8;
 
@@ -128,8 +132,10 @@ template<
   }
 
   template<
-    typename PreviousSampleStreamStageType> SampleSinkType connectSampleSink(
-        PreviousSampleStreamStageType previousSampleStreamStage) {
+    typename PreviousSampleStreamStageType> SampleConsumerType
+  connectSampleSinkToPreviousSampleStage(
+      PreviousSampleStreamStageType previousSampleStreamStage,
+      SampleConsumerCallback sampleConsumerCallback) {
     typedef typename SampleSinkType::SampleQueuePairType SampleQueuePairType;
     typedef typename SampleSinkType::SampleType SampleType;
     typedef typename SampleType::SampleFormatType SampleFormatType;
@@ -137,6 +143,7 @@ template<
     typedef typename SampleConverterType::SampleConverterSharedPtr
         SampleConverterSharedPtr;
     typedef SampleProcessor<SampleType, SampleType> SampleProcessorType;
+    typedef SampleConsumerFactory<SampleType> SampleConsumerFactoryType;
 
     SampleConverterSharedPtr pSampleConverter(
         sampleConverterSharedPtr<SampleType, SampleType, SampleConverterType>());
@@ -150,7 +157,11 @@ template<
             sampleQueuePair));
     SampleSinkType sampleSink(sampleQueuePair);
     m_sampleStreamImplBuilder.addSampleSink(sampleSink);
-    return sampleSink;
+    SampleConsumerFactoryType sampleConsumerFactory(
+        sampleSink,
+        sampleConsumerCallback);
+    SampleConsumerType sampleConsumer(sampleConsumerFactory());
+    return sampleConsumer;
   }
 
   operator bool() const {

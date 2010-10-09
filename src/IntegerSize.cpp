@@ -25,6 +25,26 @@ std::size_t IntegerSize::height() const {
   return m_height;
 }
 
+bool operator==(const IntegerSize& lhs, const IntegerSize& rhs) {
+  if (lhs.width() != rhs.width()) {
+    return false;
+  }
+  if (lhs.height() != rhs.height()) {
+    return false;
+  }
+  return true;
+}
+
+bool operator!=(const IntegerSize& lhs, const IntegerSize& rhs) {
+  if (lhs.width() == rhs.width()) {
+    return false;
+  }
+  if (lhs.height() == rhs.height()) {
+    return false;
+  }
+  return true;
+}
+
 std::ostream& operator<<(
     std::ostream& outputStream,
     const IntegerSize& integerSize) {
