@@ -123,5 +123,7 @@ int main(int argc, char *argv[]) {
   sdlMainThreadManager.setVideoMode(currentVideoFormat);
   sdlMainThreadManager.processEvents();
 
+  std::cout << "Exiting test" << std::endl;
+
   return EXIT_SUCCESS;
 }

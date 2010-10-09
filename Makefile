@@ -3,9 +3,9 @@ BOOST_INCLUDE_DIR=$(BOOST_ROOT)
 BOOST_LIB_DIR=$(BOOST_ROOT)\lib
 SDL_ROOT=..\sdl
 SDL_INCLUDE_DIR=$(SDL_ROOT)\include
-SDL_LIB_DIR=$(SDL_ROOT)\VisualC\SDL\Debug
-SDL_MAIN_LIB_DIR=$(SDL_ROOT)\VisualC\SDLmain\Debug
-SDL_BIN_DIR=$(SDL_ROOT)\VisualC\SDL\Debug
+SDL_LIB_DIR=$(SDL_ROOT)\VisualC\SDL\Release
+SDL_MAIN_LIB_DIR=$(SDL_ROOT)\VisualC\SDLmain\Release
+SDL_BIN_DIR=$(SDL_ROOT)\VisualC\SDL\Release
 LIBRARIES=kernel32.lib \
   user32.lib \
   gdi32.lib \

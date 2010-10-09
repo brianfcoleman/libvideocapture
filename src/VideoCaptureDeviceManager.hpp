@@ -28,6 +28,7 @@ class VideoCaptureDeviceManager {
   typedef std::list<VideoCaptureDevice> VideoCaptureDeviceList;
 
   VideoCaptureDeviceManager();
+  ~VideoCaptureDeviceManager();
   VideoCaptureDeviceManager(
       const ImplPtr& pImpl,
       const MessageQueueType& messageQueue,

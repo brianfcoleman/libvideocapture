@@ -5,6 +5,9 @@
 #include "boost/function.hpp"
 #include "boost/bind.hpp"
 #include "PimplUtilities.hpp"
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 namespace VideoCapture {
 
@@ -20,6 +23,12 @@ VideoCaptureDeviceManager::VideoCaptureDeviceManager(
       m_messageQueue(messageQueue),
       m_pMessageReceiver(pMessageReceiver) {
 
+}
+
+VideoCaptureDeviceManager::~VideoCaptureDeviceManager() {
+#ifdef DEBUG
+  std::cout << "VideoCaptureDeviceManager exiting" << std::endl;
+#endif
 }
 
 VideoCaptureDeviceManager::VideoCaptureDeviceList
