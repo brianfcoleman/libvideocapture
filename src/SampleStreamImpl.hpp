@@ -29,6 +29,9 @@ template<typename SampleSource, typename SampleSink> class SampleStreamImpl {
   }
 
   void processSampleStream() {
+#ifdef DEBUG
+    std::cout << "SampleStreamImpl::processSampleStream" << std::endl;
+#endif
     if (m_sampleProcessorList.empty()) {
       return;
     }

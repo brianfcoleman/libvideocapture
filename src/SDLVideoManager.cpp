@@ -3,7 +3,9 @@
 #include "PimplUtilities.hpp"
 #include "MessageReturnValue.hpp"
 #include "SynchronousMessage.hpp"
-#include "SDLNullEventProcessorCallback.hpp"
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 namespace VideoCapture {
 
@@ -13,11 +15,10 @@ SDLVideoManager::SDLVideoManager() {
 
 SDLVideoManager::SDLVideoManager(
     const ImplPtr& pImpl,
-    const MessageQueueType& messageQueue,
-    const MessageReceiverSharedPtr& pMessageReceiver)
+    const MessageQueueType& messageQueue)
     : m_pWeakImpl(pImpl),
-      m_messageQueue(messageQueue),
-      m_pMessageReceiver(pMessageReceiver) {
+      m_messageQueue(messageQueue) {
+
 }
 
 bool SDLVideoManager::setVideoMode(const RGBVideoFormat& videoFormat) {
@@ -46,6 +47,9 @@ bool SDLVideoManager::setVideoMode(const RGBVideoFormat& videoFormat) {
 
 bool SDLVideoManager::renderToScreen(
     SDLVideoManager::RGBVideoSample& videoSample) {
+#ifdef DEBUG
+  std::cout << "SDLVideoManager::renderToScreen" << std::endl;
+#endif
   typedef bool ReturnType;
   typedef boost::function<ReturnType (void)> MessageProcessorType;
   typedef MessageReturnValue<ReturnType> MessageReturnValueType;
@@ -69,59 +73,8 @@ bool SDLVideoManager::renderToScreen(
   return messageReturnValue.returnValue();
 }
 
-bool SDLVideoManager::startEventProcessor() {
-  typedef bool ReturnType;
-  typedef boost::function<ReturnType (void)> MessageProcessorType;
-  typedef MessageReturnValue<ReturnType> MessageReturnValueType;
-  MessageReturnValueType messageReturnValue(false);
-  if (!isInitialized()) {
-    return messageReturnValue.returnValue();
-  }
-  ImplPtr pImpl(lockImplPtr(m_pWeakImpl));
-  if (!pImpl) {
-    return messageReturnValue.returnValue();
-  }
-  SDLNullEventProcessorCallback nullCallback;
-  MessageProcessorType messageProcessor(
-      boost::bind<ReturnType>(
-          &SDLManagerImpl::startEventProcessor,
-          pImpl,
-          nullCallback));
-  sendSynchronousMessage<ReturnType>(
-      messageProcessor,
-      m_messageQueue,
-      messageReturnValue);
-  return messageReturnValue.returnValue();
-}
-
-bool SDLVideoManager::waitForQuitEvent() {
-  typedef bool ReturnType;
-  typedef boost::function<ReturnType (void)> MessageProcessorType;
-  typedef MessageReturnValue<ReturnType> MessageReturnValueType;
-  MessageReturnValueType messageReturnValue(false);
-  if (!isInitialized()) {
-    return messageReturnValue.returnValue();
-  }
-  ImplPtr pImpl(lockImplPtr(m_pWeakImpl));
-  if (!pImpl) {
-    return messageReturnValue.returnValue();
-  }
-
-  MessageProcessorType messageProcessor(
-      boost::bind<ReturnType>(
-          &SDLManagerImpl::waitForQuitEvent,
-          pImpl));
-  sendSynchronousMessage<ReturnType>(
-      messageProcessor,
-      m_messageQueue,
-      messageReturnValue);
-  return messageReturnValue.returnValue();
-}
-
 bool SDLVideoManager::isInitialized() const {
   return VideoCapture::isInitialized(m_pWeakImpl);
 }
-
-
 
 } // VideoCapture

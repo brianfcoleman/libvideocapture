@@ -19,8 +19,8 @@ LIBRARIES=kernel32.lib \
   odbc32.lib \
   odbccp32.lib \
   strmiids.lib
-BOOST_LIBRARIES=libboost_date_time-vc90-mt-sgd.lib \
-  libboost_thread-vc90-mt-sgd.lib
+BOOST_LIBRARIES=libboost_date_time-vc90-mt-s.lib \
+  libboost_thread-vc90-mt-s.lib
 SDL_LIBRARIES=SDL.lib \
 	SDLmain.lib
 CPP_EXT=cpp
@@ -33,9 +33,9 @@ OBJECT_DIR=build
 TARGET_DIR=bin
 TARGET=$(TARGET_DIR)\Test.$(EXECUTABLE_EXT)
 COMPILER=cl
-COMPILER_OPTIONS=/nologo /c /EHsc /MTd /Zi /DDEBUG
+COMPILER_OPTIONS=/nologo /c /EHsc /MT /Zi /DDEBUG
 LINKER=link
-LINKER_OPTIONS=/nologo
+LINKER_OPTIONS=/nologo /SUBSYSTEM:WINDOWS
 DELETE=del
 COPY=copy /y
 LIST_OBJECT_FILES=ListObjectFiles.bat

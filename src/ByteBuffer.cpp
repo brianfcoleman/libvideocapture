@@ -15,4 +15,18 @@ ByteBuffer::SizeType ByteBuffer::sizeBytes() const {
   return m_sizeBytes;
 }
 
+bool ByteBuffer::hasData() const {
+  if (!m_pFirstBufferByte) {
+    return false;
+  }
+  BytePtr byteArray = m_pFirstBufferByte;
+  for (SizeType i = 0; i < m_sizeBytes; ++i) {
+    Byte byteValue = byteArray[i];
+    if (byteValue) {
+      return true;
+    }
+  }
+  return false;
+}
+
 } // VideoCapture

@@ -3,8 +3,6 @@
 
 #include "boost/weak_ptr.hpp"
 #include "boost/shared_ptr.hpp"
-#include "MessageSenderFactory.hpp"
-#include "MessageReceiver.hpp"
 #include "Message.hpp"
 #include "MessageQueue.hpp"
 #include "RGBVideoFormat.hpp"
@@ -17,11 +15,9 @@ class SDLVideoManagerImpl;
 
 class SDLVideoManager {
  public:
-  typedef MessageSenderFactory<SDLVideoManagerImpl> MessageSenderFactoryType;
-  typedef MessageReceiver<MessageSenderFactoryType> MessageReceiverType;
-  typedef boost::shared_ptr<MessageReceiverType> MessageReceiverSharedPtr;
   typedef Message MessageType;
   typedef MessageQueue<MessageType> MessageQueueType;
+  typedef MessageQueueType::MessageSharedPtr MessageSharedPtr;
   typedef SDLVideoManagerImpl ImplType;
   typedef boost::shared_ptr<ImplType> ImplPtr;
   typedef boost::weak_ptr<ImplType> ImplWeakPtr;
@@ -30,14 +26,9 @@ class SDLVideoManager {
   SDLVideoManager();
   SDLVideoManager(
       const ImplPtr& pImpl,
-      const MessageQueueType& messageQueue,
-      const MessageReceiverSharedPtr& pMessageReceiver);
+      const MessageQueueType& messageQueue);
   bool setVideoMode(const RGBVideoFormat& videoFormat);
   bool renderToScreen(RGBVideoSample& videoSample);
-  // TODO Possibly change the api to this member function
-  // to match that of the impl
-  bool startEventProcessor();
-  bool waitForQuitEvent();
   bool isInitialized() const;
   operator bool() const {
     return isInitialized();
@@ -45,7 +36,6 @@ class SDLVideoManager {
  private:
   ImplWeakPtr m_pWeakImpl;
   mutable MessageQueueType m_messageQueue;
-  MessageReceiverSharedPtr m_pMessageReceiver;
 };
 
 } // VideoCapture

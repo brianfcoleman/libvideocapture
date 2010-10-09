@@ -1,4 +1,7 @@
 #include "SDLRenderer.hpp"
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 namespace VideoCapture {
 
@@ -8,6 +11,9 @@ SDLRenderer::SDLRenderer(const RGBVideoFormat& videoFormat)
 }
 
 bool SDLRenderer::renderToScreen(RGBVideoSample& videoSample) {
+#ifdef DEBUG
+  std::cout << "SDLRenderer::renderToScreen" << std::endl;
+#endif
   if (!isInitialized()) {
     return false;
   }
@@ -31,6 +37,21 @@ bool SDLRenderer::blitBackBufferToScreen() {
       m_pScreenSurface->rawSurfacePtr(),
       &rectScreen);
   bool didRender = (result == 0);
+  if (!didRender) {
+    return false;
+  }
+  SDL_UpdateRect(
+      m_pScreenSurface->rawSurfacePtr(),
+      rectScreen.x,
+      rectScreen.y,
+      rectScreen.w,
+      rectScreen.h);
+#ifdef DEBUG
+  std::cout << "SDLRenderer::blitBackBufferToScreen result " << result << " ";
+  std::cout << (didRender ? "" : "not ") << "did render" << std::endl;
+  std::cout << "sizeBackBuffer " << sizeBackBuffer << std::endl;
+  std::cout << "sizeScreen " << sizeScreen << std::endl;
+#endif
   return didRender;
 }
 

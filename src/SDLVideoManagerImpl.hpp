@@ -7,10 +7,9 @@ namespace VideoCapture {
 
 class SDLVideoManagerImpl : public SDLManagerImpl {
  public:
-  typedef SDLManagerImpl::MessageQueueType MessageQueueType;
   typedef boost::shared_ptr<SDLVideoManagerImpl> SDLVideoManagerImplSharedPtr;
-  SDLVideoManagerImpl(const MessageQueueType& messageQueue)
-      : SDLManagerImpl(SDL_INIT_VIDEO, messageQueue) {
+  SDLVideoManagerImpl()
+      : SDLManagerImpl(SDL_INIT_VIDEO) {
 
   }
 };

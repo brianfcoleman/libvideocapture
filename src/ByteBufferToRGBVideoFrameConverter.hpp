@@ -2,6 +2,7 @@
 #define VIDEO_CAPTURE_BYTE_BUFFER_TO_RGB_VIDEO_FRAME_CONVERTER_H
 
 #include "ByteBuffer.hpp"
+#include "ImageUtilities.hpp"
 
 namespace VideoCapture {
 
@@ -64,6 +65,8 @@ template<typename Sample> class ByteBufferToRGBVideoFrameConverter {
           SampleRef sample) {
 #ifdef DEBUG
     std::cout << "copyBufferIntoSample" << std::endl;
+    std::cout << "buffer " << (buffer.hasData() ? "" : "not ") << "has data";
+    std::cout << std::endl;
 #endif
       if (!sample) {
         return;
@@ -93,6 +96,9 @@ template<typename Sample> class ByteBufferToRGBVideoFrameConverter {
           sizeRowBytes);
 #ifdef DEBUG
     std::cout << "created imageViewBuffer" << std::endl;
+    bool hasData = imageHasData(imageViewBuffer);
+    std::cout << "imageViewBuffer " << (hasData ? "" : "not ") << "has data";
+    std::cout << std::endl;
 #endif
       SampleDataSharedPtr pSampleData(sample.sampleData());
 #ifdef DEBUG
@@ -107,7 +113,6 @@ template<typename Sample> class ByteBufferToRGBVideoFrameConverter {
       std::cout << "Assigned image view buffer to sample" << std::endl;
 #endif
     }
-
 };
 
 } // VideoCapture

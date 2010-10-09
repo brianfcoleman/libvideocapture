@@ -1,12 +1,12 @@
 #include "SDLManagerImpl.hpp"
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 namespace VideoCapture {
 
-SDLManagerImpl::SDLManagerImpl(
-    Uint32 flags,
-    const SDLManagerImpl::MessageQueueType& messageQueue)
-    : m_isInitialized(false),
-      m_messageQueue(messageQueue) {
+SDLManagerImpl::SDLManagerImpl(Uint32 flags)
+    : m_isInitialized(false) {
   m_isInitialized = initialize(flags);
 }
 
@@ -15,10 +15,6 @@ SDLManagerImpl::~SDLManagerImpl() {
     return;
   }
   SDL_Quit();
-}
-
-SDLManagerImpl::MessageQueueType SDLManagerImpl::messageQueue() {
-  return m_messageQueue;
 }
 
 bool SDLManagerImpl::initialize(Uint32 flags) {
@@ -53,6 +49,9 @@ bool SDLManagerImpl::setVideoMode(const RGBVideoFormat& videoFormat) {
 }
 
 bool SDLManagerImpl::renderToScreen(RGBVideoSample& videoSample) {
+#ifdef DEBUG
+  std::cout << "SDLManagerImpl::renderToScreen" << std::endl;
+#endif
   if (!videoSample) {
     return false;
   }
@@ -68,34 +67,6 @@ bool SDLManagerImpl::renderToScreen(RGBVideoSample& videoSample) {
   if (!m_pRenderer->renderToScreen(videoSample)) {
     return false;
   }
-  return true;
-}
-
-bool SDLManagerImpl::startEventProcessor(
-    const EventProcessorCallback& eventProcessorCallback) {
-  if (!isInitialized()) {
-    return false;
-  }
-  if (m_pEventProcessor) {
-    return true;
-  }
-  SDLEventProcessorSharedPtr pEventProcessor(
-      new SDLEventProcessor(eventProcessorCallback));
-  if (!pEventProcessor) {
-    return false;
-  }
-  m_pEventProcessor = pEventProcessor;
-  return true;
-}
-
-bool SDLManagerImpl::waitForQuitEvent() {
-  if (!isInitialized()) {
-    return false;
-  }
-  if (!m_pEventProcessor) {
-    return false;
-  }
-  m_pEventProcessor->joinThread();
   return true;
 }
 

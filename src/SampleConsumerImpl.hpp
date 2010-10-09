@@ -22,6 +22,9 @@ template<typename Sample> class SampleConsumerImpl {
   }
 
   void consumeSample() {
+#ifndef DEBUG
+    std::cout << "SampleConsumerImpl::consumeSample" << std::endl;
+#endif
     SampleType sample(m_sampleSink.removeSample());
     if (!sample) {
       return;

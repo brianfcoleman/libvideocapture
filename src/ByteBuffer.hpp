@@ -13,6 +13,7 @@ class ByteBuffer {
   ByteBuffer(BytePtr pFirstBufferByte, const SizeType sizeBytes);
   BytePtr firstBufferByte() const;
   SizeType sizeBytes() const;
+  bool hasData() const;
  private:
   BytePtr m_pFirstBufferByte;
   SizeType m_sizeBytes;

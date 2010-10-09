@@ -31,6 +31,7 @@ class SDLSurface : private boost::noncopyable {
   SizeType sizeRowBytes() const;
   RGBFormat rgbFormat() const;
   bool isInitialized() const;
+  bool hasData() const;
   operator bool() const {
     return isInitialized();
   }

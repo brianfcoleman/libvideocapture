@@ -62,6 +62,7 @@ STDMETHODIMP SampleGrabberCallback::BufferCB(
     BYTE *pBuffer,
     long BufferLen) {
 #ifdef DEBUG
+  std::cout << std::endl;
   std::cout << "SampleGrabberCallback::BufferCB" << std::endl;
 #endif
   if (!pBuffer) {

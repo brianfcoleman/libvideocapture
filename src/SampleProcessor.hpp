@@ -68,6 +68,9 @@ template<typename InputSample,
   }
 
   void processSample() {
+#ifdef DEBUG
+    std::cout << "SampleProcessor::processSample" << std::endl;
+#endif
     if (!isInitialized()) {
       return;
     }

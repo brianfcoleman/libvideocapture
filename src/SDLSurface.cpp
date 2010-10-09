@@ -1,4 +1,9 @@
 #include "SDLSurface.hpp"
+#include "boost/cstdint.hpp"
+#include "ImageUtilities.hpp"
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 namespace VideoCapture {
 
@@ -32,6 +37,9 @@ bool SDLSurface::renderToSurface(RGBVideoSample& videoSample) {
   if (!isInitialized()) {
     return false;
   }
+#ifdef DEBUG
+  std::cout << "SDLSurface::renderToSurface" << std::endl;
+#endif
   SDLSurfaceLock surfaceLock(m_pSurface);
   if (!surfaceLock) {
     return false;
@@ -85,6 +93,13 @@ template<
       pFirstPixelSurface,
       sizeRowBytes()));
   boost::gil::copy_pixels(imageView, imageViewSurface);
+#ifdef DEBUG
+  bool imageViewSurfaceHasData = imageHasData(imageViewSurface);
+  std::cout << "image view surface " << (imageViewSurfaceHasData ? "" : "not ");
+  std::cout << "has data" << std::endl;
+  std::cout << "surface " << (hasData() ? "" : "not ") << "has data";
+  std::cout << std::endl;
+#endif
 }
 
 void SDLSurface::initialize() {
@@ -105,6 +120,15 @@ RGBFormat SDLSurface::rgbFormatFromPixelFormat() {
   if (m_bitsPerPixel != 24 && m_bitsPerPixel != 32) {
     return RGBNone;
   }
+#ifdef DEBUG
+  std::cout << "SDLSurface::rgbFormatFromPixelFormat";
+  std::cout << " bitsPerPixel: " << m_bitsPerPixel;
+  std::cout << " rMask: " << pPixelFormat->Rmask;
+  std::cout << " gMask: " << pPixelFormat->Gmask;
+  std::cout << " bMask: " << pPixelFormat->Bmask;
+  std::cout << " aMask: " << pPixelFormat->Amask;
+  std::cout << std::endl;
+#endif
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
   if (m_bitsPerPixel == 24) {
     if (pPixelFormat->Rmask == 0xff000000 &&
@@ -216,26 +240,26 @@ SDLSurface::SDLSurfaceSharedPtr SDLSurface::createRGBSurfaceSharedPtr(
 #else
   switch (rgbFormat) {
     case RGB888:
-      rMask = 0xff000000;
-      gMask = 0x00ff0000;
-      bMask = 0x0000ff00;
+      rMask = 0x000000ff;
+      gMask = 0x0000ff00;
+      bMask = 0x00ff0000;
       break;
     case BGR888:
-      rMask = 0x0000ff00;
-      gMask = 0x00ff0000;
-      bMask = 0xff000000;
+      rMask = 0x00ff0000;
+      gMask = 0x0000ff00;
+      bMask = 0x000000ff;
       break;
     case RGBA8888:
-      rMask = 0xff000000;
-      gMask = 0x00ff0000;
-      bMask = 0x0000ff00;
-      aMask = 0x000000ff;
-      break;
-    case ABGR8888:
       rMask = 0x000000ff;
       gMask = 0x0000ff00;
       bMask = 0x00ff0000;
       aMask = 0xff000000;
+      break;
+    case ABGR8888:
+      rMask = 0xff000000;
+      gMask = 0x00ff0000;
+      bMask = 0x0000ff00;
+      aMask = 0x000000ff;
       break;
   }
 #endif
@@ -290,7 +314,27 @@ SDLSurface::SizeType SDLSurface::sizeRowBytes() const {
 }
 
 RGBFormat SDLSurface::rgbFormat() const {
+#ifdef DEBUG
+  std::cout << "SDLSurface::rgbFormat " << m_rgbFormat << std::endl;
+#endif
   return m_rgbFormat;
+}
+
+bool SDLSurface::hasData() const {
+  typedef boost::uint8_t Byte;
+  typedef Byte* BytePtr;
+  if (!isInitialized()) {
+    return false;
+  }
+  SizeType countBytes = sizeBytes();
+  BytePtr byteArray = reinterpret_cast<BytePtr>(m_pSurface->pixels);
+  for (SizeType i = 0; i < countBytes; ++i) {
+    Byte byteValue = byteArray[i];
+    if (byteValue) {
+      return true;
+    }
+  }
+  return false;
 }
 
 } // VideoCapture

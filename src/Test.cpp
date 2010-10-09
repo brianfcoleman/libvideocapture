@@ -3,14 +3,15 @@
 #include "SampleStreamBuilder.hpp"
 #include "RGBVideoFrame.hpp"
 #include "SDLSampleConsumerCallback.hpp"
-#include "SDLVideoManagerFactory.hpp"
+#include "SDLMainThreadManager.hpp"
 
-int main() {
+int main(int argc, char *argv[]) {
   using namespace VideoCapture;
   typedef VideoCaptureDeviceManager::VideoCaptureDeviceList
       VideoCaptureDeviceList;
   typedef VideoCaptureDeviceList::size_type size_type;
   typedef VideoCaptureDevice::RGBVideoFormatList RGBVideoFormatList;
+  typedef RGBVideoFormatList::iterator RGBVideoFormatListIterator;
   typedef Sample<RGBVideoFrame> RGBVideoSample;
   typedef SampleStreamBuilder<
     RGBVideoSample,
@@ -38,20 +39,33 @@ int main() {
   size_type countVideoFormats = videoFormatList.size();
   std::cout << "Found " << countVideoFormats;
   std::cout << " video formats" << std::endl;
-  RGBVideoFormat videoFormat(videoFormatList.front());
+  RGBVideoFormat videoFormat;
+  for (RGBVideoFormatListIterator iterator(videoFormatList.begin());
+       iterator != videoFormatList.end();
+       ++iterator) {
+    RGBVideoFormat currentVideoFormat(*iterator);
+    if (!currentVideoFormat) {
+      continue;
+    }
+    IntegerSize sizePixels(currentVideoFormat.sizePixels());
+    if (sizePixels.width() != 640) {
+      continue;
+    }
+    if (sizePixels.height() != 480) {
+      continue;
+    }
+    videoFormat = currentVideoFormat;
+  }
   bool isInitialized = videoFormat.isInitialized();
   std::cout << "video format " << (isInitialized ? "is " : "is not ");
   std::cout << "initialized" << std::endl;
+  videoCaptureDevice.setCurrentVideoFormat(videoFormat);
 
-  SDLVideoManagerFactory sdlVideoManangerFactory;
-  SDLVideoManager sdlVideoManager(sdlVideoManangerFactory());
+  SDLMainThreadManager sdlMainThreadManager;
+  SDLVideoManager sdlVideoManager(sdlMainThreadManager.videoManager());
 
   std::cout << "sdl video manager " << (sdlVideoManager ? "" : "not");
   std::cout << " is initialized" << std::endl;
-
-  sdlVideoManager.startEventProcessor();
-  RGBVideoFormat currentVideoFormat(videoCaptureDevice.currentVideoFormat());
-  sdlVideoManager.setVideoMode(currentVideoFormat);
 
   RGBVideoSampleStreamBuilder sampleStreamBuilder(
       RGBVideoSampleStreamBuilder::s_kDefaultMaxCountAllocatedSamples);
@@ -71,7 +85,9 @@ int main() {
   std::cout << (didStart ? "Did start" : "Did not start");
   std::cout << " capturing" << std::endl;
 
-  sdlVideoManager.waitForQuitEvent();
+  RGBVideoFormat currentVideoFormat(videoCaptureDevice.currentVideoFormat());
+  sdlMainThreadManager.setVideoMode(currentVideoFormat);
+  sdlMainThreadManager.processEvents();
 
   return EXIT_SUCCESS;
 }

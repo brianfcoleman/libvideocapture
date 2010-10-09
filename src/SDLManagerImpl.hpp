@@ -10,10 +10,6 @@
 #include "Sample.hpp"
 #include "SDLSurface.hpp"
 #include "SDLRenderer.hpp"
-#include "SDLEventProcessor.hpp"
-#include "SDLNullEventProcessorCallback.hpp"
-#include "Message.hpp"
-#include "MessageQueue.hpp"
 
 namespace VideoCapture {
 
@@ -23,22 +19,12 @@ class SDLManagerImpl : private boost::noncopyable {
   typedef SDLSurface::SDLSurfaceSharedPtr SDLSurfaceSharedPtr;
   typedef std::size_t SizeType;
   typedef Sample<RGBVideoFrame> RGBVideoSample;
-  typedef SDLEventProcessor::EventProcessorCallback EventProcessorCallback;
-  typedef SDLEventProcessor::SDLEventProcessorSharedPtr
-  SDLEventProcessorSharedPtr;
   typedef SDLRenderer::SDLRendererSharedPtr SDLRendererSharedPtr;
-  typedef Message MessageType;
-  typedef MessageQueue<MessageType> MessageQueueType;
 
-  SDLManagerImpl(Uint32 flags, const MessageQueueType& messageQueue);
+  SDLManagerImpl(Uint32 flags);
   virtual ~SDLManagerImpl();
-  MessageQueueType messageQueue();
   bool setVideoMode(const RGBVideoFormat& videoFormat);
   bool renderToScreen(RGBVideoSample& videoSample);
-  bool startEventProcessor(
-      const EventProcessorCallback& eventProcessorCallback =
-      SDLNullEventProcessorCallback());
-  bool waitForQuitEvent();
   bool isInitialized() const;
   operator bool() {
     return isInitialized();
@@ -46,9 +32,7 @@ class SDLManagerImpl : private boost::noncopyable {
  private:
   bool initialize(Uint32 flags);
   bool m_isInitialized;
-  MessageQueueType m_messageQueue;
   SDLRendererSharedPtr m_pRenderer;
-  SDLEventProcessorSharedPtr m_pEventProcessor;
 };
 
 } // VideoCapture
