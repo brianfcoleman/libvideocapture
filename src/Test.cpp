@@ -1,9 +1,11 @@
 #include <cstdlib>
+#include <cmath>
 #include "VideoCaptureDeviceManagerFactory.hpp"
 #include "SampleStreamBuilder.hpp"
 #include "RGBVideoFrame.hpp"
 #include "SDLSampleConsumerCallback.hpp"
 #include "SDLMainThreadManager.hpp"
+#include "RotateBy180DegreesSampleConverter.hpp"
 
 int main(int argc, char *argv[]) {
   using namespace VideoCapture;
@@ -19,6 +21,13 @@ int main(int argc, char *argv[]) {
   typedef RGBVideoSampleStreamBuilder::SampleSourceType SampleSourceType;
   typedef RGBVideoSampleStreamBuilder::SampleConsumerType SampleConsumerType;
   typedef RGBVideoSampleStreamBuilder::SampleStreamType RGBVideoSampleStream;
+  typedef SampleConverter<
+    RGBVideoSample,
+    RGBVideoSample> SampleConverterType;
+  typedef SampleConverterType::SampleConverterSharedPtr SampleConverterSharedPtr;
+  typedef SampleProcessor<
+    RGBVideoSample,
+    RGBVideoSample> SampleProcessorType;
 
 #ifdef DEBUG
   std::cout << "Debug" << std::endl;
@@ -60,6 +69,10 @@ int main(int argc, char *argv[]) {
   std::cout << "video format " << (isInitialized ? "is " : "is not ");
   std::cout << "initialized" << std::endl;
   videoCaptureDevice.setCurrentVideoFormat(videoFormat);
+  RGBVideoFormat currentVideoFormat(videoCaptureDevice.currentVideoFormat());
+  boost::int32_t angleRotationDegrees =
+      currentVideoFormat.angleRotationDegrees();
+  bool isUpsideDown = (abs(angleRotationDegrees) == kAngleHalfRotationDegrees);
 
   SDLMainThreadManager sdlMainThreadManager;
   SDLVideoManager sdlVideoManager(sdlMainThreadManager.videoManager());
@@ -71,11 +84,33 @@ int main(int argc, char *argv[]) {
       RGBVideoSampleStreamBuilder::s_kDefaultMaxCountAllocatedSamples);
   SampleSourceType sampleSource(
       sampleStreamBuilder.connectSampleSource(videoCaptureDevice));
+  SampleProcessorType previousSampleStage;
+  if (isUpsideDown) {
+    SampleConverterSharedPtr pRotateBy180DegreesSampleConverter(
+        sampleConverterSharedPtr<
+        RGBVideoSample,
+        RGBVideoSample,
+        RotateBy180DegreesSampleConverter>());
+    previousSampleStage =
+        sampleStreamBuilder.connectSampleConverterToPreviousSampleStage<
+          SampleSourceType,
+          RGBVideoSample>(
+            sampleSource,
+            pRotateBy180DegreesSampleConverter);
+  }
   SDLSampleConsumerCallback sampleConsumerCallback(sdlVideoManager);
-  SampleConsumerType sampleConsumer(
-      sampleStreamBuilder.connectSampleSinkToPreviousSampleStage(
-          sampleSource,
-          sampleConsumerCallback));
+  SampleConsumerType sampleConsumer;
+  if (isUpsideDown) {
+      sampleConsumer =
+          sampleStreamBuilder.connectSampleSinkToPreviousSampleStage(
+              previousSampleStage,
+              sampleConsumerCallback);
+  } else {
+    sampleConsumer =
+        sampleStreamBuilder.connectSampleSinkToPreviousSampleStage(
+            sampleSource,
+            sampleConsumerCallback);
+  }
   bool isReadyToBuild = sampleStreamBuilder.isReadyToBuild();
   std::cout << (isReadyToBuild ? "isReadyToBuild" : "not isReadyToBuild");
   std::cout << std::endl;
@@ -85,7 +120,6 @@ int main(int argc, char *argv[]) {
   std::cout << (didStart ? "Did start" : "Did not start");
   std::cout << " capturing" << std::endl;
 
-  RGBVideoFormat currentVideoFormat(videoCaptureDevice.currentVideoFormat());
   sdlMainThreadManager.setVideoMode(currentVideoFormat);
   sdlMainThreadManager.processEvents();
 

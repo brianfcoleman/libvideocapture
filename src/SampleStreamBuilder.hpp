@@ -124,7 +124,8 @@ template<
     typedef typename RecyclingSampleQueuePair<ConvertedSampleType>
         ConvertedSampleQueuePairType;
     ConvertedSampleQueuePairType convertedSampleQueuePair(
-        singleThreadedRecyclingSampleQueuePair(m_maxCountAllocatedSamples));
+        singleThreadedRecyclingSampleQueuePair<ConvertedSampleType>(
+            m_maxCountAllocatedSamples));
     return connectSampleConverterToPreviousSampleStage(
         previousSampleStreamStage,
         pSampleConverter,

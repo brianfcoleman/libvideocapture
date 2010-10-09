@@ -18,6 +18,10 @@ template<typename Sample> class SampleConsumer {
   SampleConsumerCallback;
   typedef typename SampleConsumerImplType::SampleSinkType SampleSinkType;
 
+  SampleConsumer() {
+
+  }
+
   SampleConsumer(const ProcessorThreadSharedPtr& pProcessorThread)
       : m_pProcessorThread(pProcessorThread) {
 

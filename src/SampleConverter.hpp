@@ -10,12 +10,14 @@ template<
   typename InputSample,
   typename OutputSample> class SampleConverter : private boost::noncopyable {
  public:
-  typedef SampleConverter<InputSample, OutputSample> SampleConverterType;
+  typedef InputSample InputSampleType;
+  typedef OutputSample OutputSampleType;
+  typedef SampleConverter<InputSampleType, OutputSampleType> SampleConverterType;
   typedef boost::shared_ptr<SampleConverterType> SampleConverterSharedPtr;
-  typedef typename InputSample::SampleFormatType InputSampleFormatType;
-  typedef typename OutputSample::SampleFormatType OutputSampleFormatType;
-  typedef InputSample& InputSampleRef;
-  typedef OutputSample& OutputSampleRef;
+  typedef typename InputSampleType::SampleFormatType InputSampleFormatType;
+  typedef typename OutputSampleType::SampleFormatType OutputSampleFormatType;
+  typedef InputSampleType& InputSampleRef;
+  typedef OutputSampleType& OutputSampleRef;
 
   SampleConverter() {
 

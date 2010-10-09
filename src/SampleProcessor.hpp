@@ -12,6 +12,7 @@ template<typename InputSample,
  public:
   typedef InputSample InputSampleType;
   typedef OutputSample OutputSampleType;
+  typedef OutputSampleType SampleType;
   typedef typename OutputSampleType::SampleAllocatorType SampleAllocatorType;
   typedef typename SampleAllocatorType::SizeType SizeType;
   typedef SampleConverter<InputSampleType, OutputSampleType> SampleConverterType;
