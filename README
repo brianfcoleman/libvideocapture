@@ -38,3 +38,5 @@ I compiled this library using Visual Studio 2008
    the devices and cleans up after them.
    A VideoCaptureDevice has a list of supported RGBVideoFormat's which can be set.
    Call startCapturing to start capturing.
+13.If you want to use different names for the boost and SDL directories,
+   these can be changed in the Makefile. Just change BOOST_ROOT and/or SDL_ROOT
